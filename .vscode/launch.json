@@ -1,0 +1,97 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class Vehicle {
+protected:
+    int id;
+    string type;
+    int waitTime;
+
+public:
+    Vehicle(int i, string t, int w)
+        : id(i), type(t), waitTime(w) {}
+
+    virtual int getPriority() const {
+        return waitTime;
+    }
+
+    virtual void display() const {
+        cout << "ID: " << id
+             << " | Type: " << type
+             << " | Priority: " << getPriority() << endl;
+    }
+
+    virtual ~Vehicle() {}
+};
+
+class EmergencyVehicle : public Vehicle {
+public:
+    EmergencyVehicle(int i, string t, int w)
+        : Vehicle(i, t, w) {}
+
+    int getPriority() const override {
+        return waitTime + 100;
+    }
+
+    void display() const override {
+        cout << "ID: " << id
+             << " | Emergency: " << type
+             << " | Priority: " << getPriority() << endl;
+    }
+};
+
+class TrafficLane {
+private:
+    vector<Vehicle*> vehicles;
+
+public:
+    void addVehicle(Vehicle* v) {
+        vehicles.push_back(v);
+    }
+
+    void displayVehicles() const {
+        cout << "\n--- Traffic Lane ---\n";
+        for (Vehicle* v : vehicles)
+            v->display();
+    }
+
+    Vehicle* findHighestPriority() const {
+        if (vehicles.empty())
+            return nullptr;
+
+        Vehicle* highest = vehicles[0];
+
+        for (Vehicle* v : vehicles) {
+            if (v->getPriority() > highest->getPriority())
+                highest = v;
+        }
+
+        return highest;
+    }
+
+    ~TrafficLane() {
+        for (Vehicle* v : vehicles)
+            delete v;
+    }
+};
+
+int main() {
+    TrafficLane lane;
+
+    lane.addVehicle(new Vehicle(101, "Car", 10));
+    lane.addVehicle(new Vehicle(102, "Bike", 15));
+    lane.addVehicle(new EmergencyVehicle(103, "Ambulance", 20));
+    lane.addVehicle(new EmergencyVehicle(104, "Fire", 12));
+
+    lane.displayVehicles();
+
+    Vehicle* priority = lane.findHighestPriority();
+
+    if (priority != nullptr) {
+        cout << "\nHighest Priority Vehicle:\n";
+        priority->display();
+    }
+
+    return 0;

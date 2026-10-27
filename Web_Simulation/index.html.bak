@@ -1,0 +1,3543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Traffic – Emergency Priority Command Center</title>
+<style>
+/* ==========================================================================
+   SMART TRAFFIC COMMAND CENTER - PROFESSIONAL CONTROL ROOM STYLING
+   Dark futuristic dashboard, cyan/purple/blue accents, glassmorphic cards
+   ========================================================================== */
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+    --bg:#070814;
+    --panel:rgba(14,17,34,0.85);
+    --panel-solid:#0d1022;
+    --panel-hover:rgba(22,27,52,0.9);
+    --border:rgba(155,124,255,0.14);
+    --border-bright:rgba(69,230,255,0.35);
+    --text:#f0f3ff;
+    --text-dim:#9ba3c4;
+    --text-muted:#6b7294;
+    --cyan:#45e6ff;
+    --cyan-glow:rgba(69,230,255,0.25);
+    --purple:#9b7cff;
+    --purple-glow:rgba(155,124,255,0.25);
+    --blue:#388bfd;
+    --green:#35e98c;
+    --green-glow:rgba(53,233,140,0.25);
+    --amber:#ffb454;
+    --amber-glow:rgba(255,180,84,0.25);
+    --red:#ff4d5e;
+    --red-glow:rgba(255,77,94,0.35);
+    --font-sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --font-mono:"JetBrains Mono","SF Mono",Consolas,Menlo,monospace;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 85% 8%,rgba(155,124,255,0.12),transparent 32%),
+        radial-gradient(circle at 12% 85%,rgba(69,230,255,0.08),transparent 28%),
+        radial-gradient(circle at 50% 50%,rgba(10,12,26,0.95),var(--bg));
+    color:var(--text);
+    font-family:var(--font-sans);
+    overflow-x:hidden;
+    overflow-y:auto;
+    line-height:1.4;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:rgba(8,10,22,0.5)}
+::-webkit-scrollbar-thumb{background:rgba(155,124,255,0.25);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(69,230,255,0.45)}
+
+/* ---------- TOP COMMAND BAR ---------- */
+.topbar{
+    height:74px;
+    padding:0 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--border);
+    background:rgba(7,9,20,0.92);
+    backdrop-filter:blur(16px);
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.brandMark{
+    width:42px;height:42px;
+    border-radius:12px;
+    background:linear-gradient(135deg,var(--purple),var(--cyan));
+    color:#050710;
+    display:grid;
+    place-items:center;
+    font-size:22px;
+    font-weight:900;
+    box-shadow:0 0 20px var(--cyan-glow);
+    transform:rotate(-6deg);
+    transition:transform .3s;
+}
+.brandMark:hover{transform:rotate(0deg) scale(1.05)}
+
+.brand h1{
+    font-size:17px;
+    letter-spacing:1.8px;
+    font-weight:800;
+    background:linear-gradient(90deg,#fff,var(--cyan));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.brand p{
+    color:var(--text-muted);
+    font-size:8.5px;
+    letter-spacing:2px;
+    margin-top:2px;
+    font-weight:600;
+}
+
+.topRight{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.clockWidget{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    font-family:var(--font-mono);
+}
+
+.clockTime{
+    font-size:14px;
+    font-weight:700;
+    color:var(--text);
+    letter-spacing:1px;
+}
+
+.clockDate{
+    font-size:9px;
+    color:var(--text-muted);
+    letter-spacing:1.2px;
+}
+
+.systemBadge{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 14px;
+    border:1px solid rgba(53,233,140,0.3);
+    border-radius:30px;
+    color:var(--green);
+    background:rgba(53,233,140,0.06);
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:1.2px;
+    box-shadow:0 0 16px rgba(53,233,140,0.1);
+}
+
+.beaconDot{
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 10px var(--green);
+    position:relative;
+}
+.beaconDot::after{
+    content:"";
+    position:absolute;
+    inset:-4px;
+    border-radius:50%;
+    border:1px solid var(--green);
+    animation:radarPing 2s cubic-bezier(0,0,.2,1) infinite;
+}
+@keyframes radarPing{
+    0%{transform:scale(.8);opacity:1}
+    100%{transform:scale(2.2);opacity:0}
+}
+
+.syncText{
+    font-size:8.5px;
+    color:var(--text-muted);
+    font-family:var(--font-mono);
+    border-left:1px solid var(--border);
+    padding-left:12px;
+}
+
+/* ---------- EMERGENCY BROADCAST BANNER ---------- */
+.emergBanner{
+    display:none;
+    margin:14px 20px 0;
+    padding:12px 20px;
+    border-radius:12px;
+    background:linear-gradient(90deg,rgba(255,77,94,0.18),rgba(155,124,255,0.15));
+    border:1px solid rgba(255,77,94,0.55);
+    box-shadow:0 0 25px rgba(255,77,94,0.22);
+    align-items:center;
+    justify-content:space-between;
+    animation:bannerPulse 2s infinite ease-in-out;
+}
+.emergBanner.active{display:flex}
+@keyframes bannerPulse{
+    0%,100%{border-color:rgba(255,77,94,0.5);box-shadow:0 0 20px rgba(255,77,94,0.2)}
+    50%{border-color:rgba(255,77,94,0.9);box-shadow:0 0 35px rgba(255,77,94,0.45)}
+}
+.emergBannerLeft{display:flex;align-items:center;gap:12px}
+.emergIcon{font-size:20px;animation:shake 1s infinite alternate}
+@keyframes shake{0%{transform:rotate(-8deg)}100%{transform:rotate(8deg)}}
+.emergTitle{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--red)}
+.emergSubtitle{font-size:9.5px;color:#fce4e8;margin-top:2px}
+.emergScoreTag{
+    padding:4px 10px;
+    border-radius:6px;
+    background:rgba(255,77,94,0.25);
+    border:1px solid var(--red);
+    font-family:var(--font-mono);
+    font-size:11px;
+    font-weight:800;
+    color:#fff;
+}
+
+/* ---------- DASHBOARD CONTAINER ---------- */
+.dashboard{
+    padding:16px 20px 24px;
+    max-width:1600px;
+    margin:auto;
+}
+
+/* ---------- QUICK STATS BAR (6 CARDS) ---------- */
+.quickStats{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:12px;
+    margin-bottom:14px;
+}
+
+.statCard{
+    padding:13px 15px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:linear-gradient(160deg,rgba(18,22,46,0.85),rgba(10,12,26,0.92));
+    backdrop-filter:blur(12px);
+    position:relative;
+    overflow:hidden;
+    transition:transform .2s,border-color .2s;
+}
+.statCard:hover{
+    transform:translateY(-2px);
+    border-color:rgba(155,124,255,0.35);
+}
+.statCard::after{
+    content:"";
+    position:absolute;
+    width:70px;height:70px;
+    right:-25px;bottom:-25px;
+    border-radius:50%;
+    background:rgba(155,124,255,0.06);
+    pointer-events:none;
+}
+.statLabel{
+    color:var(--text-muted);
+    font-size:8.5px;
+    letter-spacing:1.3px;
+    font-weight:700;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.statTrend{
+    font-size:8px;
+    font-weight:700;
+    padding:2px 5px;
+    border-radius:4px;
+}
+.statTrend.up{color:var(--cyan);background:rgba(69,230,255,0.1)}
+.statTrend.down{color:var(--amber);background:rgba(255,180,84,0.1)}
+.statTrend.normal{color:var(--green);background:rgba(53,233,140,0.1)}
+.statTrend.critical{color:var(--red);background:rgba(255,77,94,0.15)}
+
+.statValue{
+    font-size:22px;
+    font-weight:800;
+    margin-top:6px;
+    font-family:var(--font-mono);
+    color:var(--text);
+    display:flex;
+    align-items:baseline;
+    gap:5px;
+}
+.statUnit{font-size:10px;color:var(--text-muted);font-weight:600}
+.statSub{
+    color:var(--text-muted);
+    font-size:8px;
+    margin-top:3px;
+    letter-spacing:.8px;
+}
+
+/* ---------- 3-COLUMN MAIN LAYOUT ---------- */
+.mainLayout{
+    display:grid;
+    grid-template-columns:360px 1fr 380px;
+    gap:14px;
+    align-items:start;
+}
+
+.col{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:0 12px 35px rgba(0,0,0,0.42),inset 0 1px 0 rgba(255,255,255,0.04);
+    backdrop-filter:blur(14px);
+    overflow:hidden;
+    transition:border-color .2s;
+}
+.card:hover{
+    border-color:rgba(155,124,255,0.26);
+}
+
+.cardHeader{
+    padding:13px 16px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:rgba(255,255,255,0.015);
+}
+
+.cardTitle{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1.2px;
+    color:var(--text);
+}
+.cardTitle i{
+    color:var(--cyan);
+    font-style:normal;
+    font-size:12px;
+}
+
+.tag{
+    font-size:8px;
+    font-weight:700;
+    padding:3px 7px;
+    border-radius:5px;
+    color:var(--cyan);
+    border:1px solid rgba(69,230,255,0.3);
+    background:rgba(69,230,255,0.07);
+    letter-spacing:1px;
+    font-family:var(--font-mono);
+}
+
+.cardBody{
+    padding:14px 16px;
+}
+
+/* ---------- FORMS & BUTTONS ---------- */
+.field{margin-bottom:9px}
+.field label{
+    display:block;
+    color:var(--text-dim);
+    font-size:8.5px;
+    letter-spacing:1px;
+    margin-bottom:4px;
+    font-weight:600;
+}
+input,select{
+    width:100%;
+    padding:8px 11px;
+    border-radius:8px;
+    background:#080a18;
+    border:1px solid #232845;
+    color:var(--text);
+    outline:none;
+    font-size:11px;
+    font-family:var(--font-mono);
+    transition:border-color .2s,box-shadow .2s;
+}
+input:focus,select:focus{
+    border-color:var(--purple);
+    box-shadow:0 0 0 2px var(--purple-glow);
+}
+
+.btnGrid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:7px;
+    margin-top:10px;
+}
+
+button{
+    padding:9px;
+    border:none;
+    border-radius:8px;
+    font-weight:700;
+    cursor:pointer;
+    font-size:9px;
+    letter-spacing:1px;
+    transition:transform .15s,filter .15s,box-shadow .15s;
+    font-family:var(--font-sans);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+}
+button:hover{
+    transform:translateY(-1px);
+    filter:brightness(1.12);
+}
+button:active{transform:translateY(0)}
+button:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    transform:none!important;
+    filter:none!important;
+}
+
+.btn-insert{background:linear-gradient(135deg,#2cc48d,#1c9b6c);color:#05130d}
+.btn-update{background:linear-gradient(135deg,#388bfd,#2269d4);color:#fff}
+.btn-delete{background:linear-gradient(135deg,#ff4d5e,#d8283a);color:#fff}
+.btn-search{background:linear-gradient(135deg,#ffb454,#ea9022);color:#190e00}
+.btn-display{background:linear-gradient(135deg,#9b7cff,#7850f2);color:#fff}
+.btn-clear{background:#1e233a;color:#c9d0f2;border:1px solid #2f3659}
+
+.prioControls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin-top:9px;
+    padding-top:9px;
+    border-top:1px solid var(--border);
+}
+.btn-start{
+    background:linear-gradient(135deg,#00e5ff,#0091ea);
+    color:#031422;
+    box-shadow:0 0 16px var(--cyan-glow);
+    font-weight:800;
+}
+.btn-stop{
+    background:linear-gradient(135deg,#e53935,#b71c1c);
+    color:#fff;
+    font-weight:800;
+}
+
+/* ---------- CANVAS & JUNCTION VIEW ---------- */
+.simBox{
+    position:relative;
+    border-radius:16px;
+    overflow:hidden;
+    background:#070d0b;
+    border:1px solid #1a2a22;
+    box-shadow:0 12px 35px rgba(0,0,0,0.55);
+}
+
+.simCanvas{
+    width:100%;
+    height:500px;
+    display:block;
+    background:#0b1310;
+}
+
+.simOverlayTop{
+    position:absolute;
+    top:12px;left:12px;right:12px;
+    display:flex;
+    justify-content:space-between;
+    pointer-events:none;
+}
+
+.simModeTag{
+    padding:6px 12px;
+    border-radius:8px;
+    background:rgba(6,10,18,0.88);
+    border:1px solid rgba(69,230,255,0.3);
+    color:var(--cyan);
+    font-size:8.5px;
+    letter-spacing:1.5px;
+    font-weight:800;
+    font-family:var(--font-mono);
+    backdrop-filter:blur(8px);
+}
+
+.simSignalsBox{
+    display:flex;
+    gap:8px;
+}
+
+.signalPill{
+    padding:5px 10px;
+    border-radius:7px;
+    background:rgba(6,10,18,0.88);
+    border:1px solid #232a39;
+    font-size:8.5px;
+    font-family:var(--font-mono);
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    gap:6px;
+    backdrop-filter:blur(8px);
+}
+.sigDot{
+    width:7px;height:7px;border-radius:50%;
+}
+.sigDot.green{background:var(--green);box-shadow:0 0 8px var(--green)}
+.sigDot.yellow{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+.sigDot.red{background:var(--red);box-shadow:0 0 8px var(--red)}
+
+.simHudBottom{
+    position:absolute;
+    bottom:12px;left:12px;right:12px;
+    padding:10px 14px;
+    border-radius:10px;
+    background:rgba(6,9,18,0.88);
+    border:1px solid rgba(155,124,255,0.22);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-size:9px;
+    font-family:var(--font-mono);
+    backdrop-filter:blur(8px);
+}
+
+/* ---------- DATA STRUCTURE VISUALIZERS ---------- */
+.dsSection{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.dsCard{
+    background:#080a16;
+    border:1px solid #20243d;
+    border-radius:10px;
+    padding:10px 12px;
+}
+.dsHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:6px;
+}
+.dsTitle{
+    font-size:8.5px;
+    color:var(--text-muted);
+    letter-spacing:1.2px;
+    font-weight:700;
+    font-family:var(--font-mono);
+}
+.dsActions{
+    display:flex;
+    gap:4px;
+}
+.dsBadge{
+    font-size:7.5px;
+    padding:2px 6px;
+    border-radius:4px;
+    background:#16192c;
+    color:var(--text-dim);
+    font-family:var(--font-mono);
+}
+
+.dsBox{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:8px;
+    border-radius:8px;
+    background:#05070e;
+    border:1px solid #1a1e34;
+    min-height:42px;
+    overflow-x:auto;
+}
+.dsNode{
+    padding:4px 8px;
+    border-radius:6px;
+    background:linear-gradient(135deg,#161a33,#0f1224);
+    border:1px solid rgba(155,124,255,0.3);
+    color:var(--text);
+    font-size:8.5px;
+    font-weight:700;
+    white-space:nowrap;
+    font-family:var(--font-mono);
+    display:flex;
+    align-items:center;
+    gap:4px;
+}
+.dsNode.emergency{
+    border-color:rgba(255,77,94,0.5);
+    background:linear-gradient(135deg,#2e1117,#1a090d);
+    color:#ff8a95;
+}
+.dsIdx{font-size:7px;color:var(--cyan);opacity:.8}
+.dsArrow{color:var(--cyan);font-size:10px}
+.dsEmpty{color:#494f6c;font-size:8px;letter-spacing:1px;font-family:var(--font-mono)}
+
+/* ---------- PROCESSOR & COA SECTION ---------- */
+.coaGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:7px;
+    margin-bottom:10px;
+}
+
+.regBox{
+    background:#080a16;
+    border:1px solid #20243d;
+    border-radius:8px;
+    padding:7px 5px;
+    text-align:center;
+    transition:border-color .2s;
+}
+.regBox.highlight{
+    border-color:var(--cyan);
+    box-shadow:0 0 10px var(--cyan-glow);
+}
+.regName{
+    font-size:8px;
+    color:var(--text-muted);
+    font-family:var(--font-mono);
+    letter-spacing:1px;
+}
+.regVal{
+    font-size:13px;
+    font-weight:800;
+    color:var(--cyan);
+    margin-top:2px;
+    font-family:var(--font-mono);
+}
+
+.coaMathBox{
+    background:#070914;
+    border:1px solid #1e2238;
+    border-radius:10px;
+    padding:10px;
+    font-family:var(--font-mono);
+    font-size:8.5px;
+    color:#ccd2ff;
+    line-height:1.55;
+    margin-bottom:10px;
+}
+.mathRow{display:flex;justify-content:space-between;padding:2px 0}
+.mathLabel{color:var(--text-muted)}
+.mathVal{color:var(--text);font-weight:700}
+.mathRow.total{
+    border-top:1px solid #2a2e49;
+    margin-top:5px;
+    padding-top:5px;
+    color:var(--cyan);
+    font-size:9.5px;
+}
+
+.aluResultCard{
+    padding:11px;
+    border-radius:10px;
+    background:linear-gradient(145deg,#0c1024,#080a16);
+    border:1px solid #272f4e;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+.aluLeft small{
+    display:block;
+    color:var(--text-muted);
+    font-size:8px;
+    letter-spacing:1px;
+}
+.aluScore{
+    font-size:24px;
+    font-weight:900;
+    color:var(--cyan);
+    font-family:var(--font-mono);
+}
+.prioBadge{
+    padding:5px 10px;
+    border-radius:6px;
+    font-size:8.5px;
+    font-weight:800;
+    letter-spacing:1px;
+    background:#12241e;
+    color:var(--green);
+    border:1px solid rgba(53,233,140,0.3);
+}
+.prioBadge.active{
+    background:#2f1118;
+    color:var(--red);
+    border-color:rgba(255,77,94,0.4);
+}
+
+/* ---------- LIVE ACTIVITY FEED ---------- */
+.activityFeed{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    max-height:165px;
+    overflow-y:auto;
+    padding-right:4px;
+}
+.activityItem{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    padding:5px 8px;
+    border-radius:6px;
+    background:#080a16;
+    border-left:2px solid var(--purple);
+    font-size:8.5px;
+    font-family:var(--font-mono);
+    color:#d0d5ef;
+    animation:fadeIn .25s ease-out;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.activityItem.insert{border-left-color:var(--green)}
+.activityItem.delete{border-left-color:var(--red)}
+.activityItem.prio{border-left-color:var(--cyan)}
+.activityItem.update{border-left-color:var(--blue)}
+.actTime{color:var(--text-muted);font-size:7.5px}
+.actTag{
+    font-size:7px;
+    padding:1px 4px;
+    border-radius:3px;
+    background:rgba(255,255,255,0.08);
+}
+
+/* ---------- DATABASE TABLE & FILTERS ---------- */
+.tableCard{margin-top:14px}
+.tableToolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 16px;
+    border-bottom:1px solid var(--border);
+    background:rgba(255,255,255,0.01);
+}
+.filterPills{
+    display:flex;
+    gap:6px;
+}
+.filterBtn{
+    padding:4px 10px;
+    border-radius:6px;
+    background:#0b0d1c;
+    border:1px solid #232845;
+    color:var(--text-dim);
+    font-size:8.5px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:var(--font-sans);
+}
+.filterBtn.active{
+    background:rgba(69,230,255,0.12);
+    border-color:var(--cyan);
+    color:var(--cyan);
+}
+.tableSearchBox{
+    width:180px;
+    height:28px;
+    font-size:9.5px;
+    padding:0 8px;
+}
+
+.tableWrap{
+    max-height:220px;
+    overflow-y:auto;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:9px;
+    font-family:var(--font-mono);
+}
+th{
+    background:#0a0c1a;
+    color:var(--text-muted);
+    text-align:left;
+    padding:9px 12px;
+    font-weight:700;
+    letter-spacing:1px;
+    position:sticky;
+    top:0;
+    border-bottom:1px solid var(--border);
+}
+td{
+    padding:8px 12px;
+    border-top:1px solid #171b30;
+    color:#e5e8fa;
+    vertical-align:middle;
+}
+tr:hover td{background:rgba(69,230,255,0.03)}
+tr.selectedRow td{
+    background:rgba(155,124,255,0.12)!important;
+}
+tr.selectedRow td:first-child{
+    border-left:3px solid var(--cyan);
+}
+tr.emergRow td{color:#ff8a95}
+
+.statusPill{
+    display:inline-block;
+    padding:2px 7px;
+    border-radius:4px;
+    font-size:7.5px;
+    font-weight:800;
+    letter-spacing:.8px;
+}
+.statusPill.moving{background:rgba(53,233,140,0.12);color:var(--green);border:1px solid rgba(53,233,140,0.3)}
+.statusPill.waiting{background:rgba(255,180,84,0.12);color:var(--amber);border:1px solid rgba(255,180,84,0.3)}
+.statusPill.crossing{background:rgba(69,230,255,0.12);color:var(--cyan);border:1px solid rgba(69,230,255,0.3)}
+.statusPill.priority{background:rgba(255,77,94,0.16);color:var(--red);border:1px solid rgba(255,77,94,0.4)}
+.statusPill.stopped{background:rgba(155,124,255,0.12);color:var(--purple);border:1px solid rgba(155,124,255,0.3)}
+
+/* ---------- MISSION CONTROL FOOTER BANNER ---------- */
+.missionBanner{
+    margin-top:14px;
+    padding:11px 18px;
+    border-radius:12px;
+    background:linear-gradient(90deg,rgba(155,124,255,0.1),rgba(69,230,255,0.06));
+    border:1px solid rgba(155,124,255,0.25);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-size:9.5px;
+}
+
+/* ---------- TOAST NOTIFICATION CONTAINER ---------- */
+#toastContainer{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:9999;
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+    pointer-events:none;
+}
+.toast{
+    pointer-events:auto;
+    min-width:300px;
+    max-width:380px;
+    padding:12px 16px;
+    border-radius:10px;
+    background:rgba(10,13,26,0.95);
+    border:1px solid var(--border);
+    box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    backdrop-filter:blur(14px);
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+    font-size:9.5px;
+    animation:toastSlideIn .25s ease-out;
+    transition:opacity .3s,transform .3s;
+}
+@keyframes toastSlideIn{
+    from{opacity:0;transform:translateX(50px)}
+    to{opacity:1;transform:translateX(0)}
+}
+.toast.toast-success{border-color:rgba(53,233,140,0.5);box-shadow:0 0 20px rgba(53,233,140,0.15)}
+.toast.toast-warning{border-color:rgba(255,180,84,0.5);box-shadow:0 0 20px rgba(255,180,84,0.15)}
+.toast.toast-error{border-color:rgba(255,77,94,0.5);box-shadow:0 0 20px rgba(255,77,94,0.15)}
+.toast.toast-emergency{border-color:rgba(255,77,94,0.9);box-shadow:0 0 30px rgba(255,77,94,0.35);background:linear-gradient(135deg,rgba(28,9,14,0.96),rgba(10,13,26,0.96))}
+.toast.toast-info{border-color:rgba(69,230,255,0.5);box-shadow:0 0 20px rgba(69,230,255,0.15)}
+.toastIcon{font-size:14px;font-weight:800;line-height:1}
+.toastBody{flex:1}
+.toastTitle{font-weight:800;letter-spacing:1px;margin-bottom:2px}
+.toastMsg{color:var(--text-dim);font-size:8.5px}
+
+/* ---------- CONFIRMATION MODAL ---------- */
+.modalOverlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(3,5,12,0.78);
+    backdrop-filter:blur(8px);
+    z-index:9000;
+    align-items:center;
+    justify-content:center;
+}
+.modalOverlay.active{display:flex}
+.modalDialog{
+    width:360px;
+    background:linear-gradient(180deg,#13162c,#0a0c18);
+    border:1px solid rgba(155,124,255,0.3);
+    border-radius:14px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.8);
+    padding:20px;
+    animation:modalPop .2s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes modalPop{
+    from{opacity:0;transform:scale(.92)}
+    to{opacity:1;transform:scale(1)}
+}
+.modalTitle{font-size:13px;font-weight:800;letter-spacing:1.2px;margin-bottom:8px;color:var(--text)}
+.modalMsg{font-size:9.5px;color:var(--text-dim);line-height:1.5;margin-bottom:16px}
+.modalActions{display:flex;justify-content:flex-end;gap:8px}
+
+/* Responsive Breakpoints */
+@media(max-width:1280px){
+    .mainLayout{grid-template-columns:320px 1fr 330px}
+    .quickStats{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:960px){
+    .mainLayout{grid-template-columns:1fr}
+    .quickStats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+    .quickStats{grid-template-columns:1fr}
+    .topbar{padding:0 14px}
+    .dashboard{padding:10px}
+}
+
+/* ---------- COMPUTER GRAPHICS / CG PANEL ---------- */
+.cgPanel{margin-top:14px}
+.cgGrid{
+    display:grid;
+    grid-template-columns:1fr;
+}
+.cgStatusGrid{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:10px;
+}
+.cgBlock{
+    background:#080a16;
+    border:1px solid #20243d;
+    border-radius:10px;
+    padding:12px;
+}
+.cgBlockTitle{
+    font-size:10px;
+    color:var(--cyan);
+    letter-spacing:.5px;
+    font-weight:800;
+    margin-bottom:8px;
+}
+.cgRow{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:8px;
+    padding:5px 0;
+    border-bottom:1px solid rgba(255,255,255,0.04);
+    font-size:10px;
+}
+.cgRow:last-child{border-bottom:none}
+.cgLabel{color:var(--text-muted)}
+.cgVal{color:var(--cyan);font-weight:700;text-align:right}
+.cgVal.green{color:var(--green)}
+.cgDemoLink{text-decoration:none}
+.cgDemoLink:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.cgSignalStage{
+    height:96px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    perspective:240px;
+}
+.cgSignalModel{
+    position:relative;
+    width:42px;
+    height:84px;
+    transform-style:preserve-3d;
+    animation:cgSignalTurn 9s linear infinite;
+}
+.cgSignalHousing{
+    position:absolute;
+    top:0;
+    left:6px;
+    width:30px;
+    height:52px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-evenly;
+    border:1px solid #374354;
+    border-radius:5px;
+    background:#111c26;
+    box-shadow:inset -5px 0 #080f16,0 5px 12px rgba(0,0,0,.35);
+}
+.cgSignalHousing::after{
+    content:"";
+    position:absolute;
+    top:3px;
+    right:-7px;
+    width:6px;
+    height:44px;
+    border:1px solid #303b48;
+    border-left:0;
+    border-radius:0 3px 3px 0;
+    background:#0b141c;
+    transform:rotateY(90deg);
+    transform-origin:left center;
+}
+.cgSignalLight{
+    width:9px;
+    height:9px;
+    margin:0 auto;
+    border-radius:50%;
+}
+.cgSignalLight.red{background:#ff4d5e;box-shadow:0 0 7px rgba(255,77,94,.65)}
+.cgSignalLight.yellow{background:#ffb454;box-shadow:0 0 7px rgba(255,180,84,.55)}
+.cgSignalLight.green{background:#35e98c;box-shadow:0 0 7px rgba(53,233,140,.55)}
+.cgSignalPole{
+    position:absolute;
+    top:51px;
+    left:19px;
+    width:5px;
+    height:32px;
+    border-radius:2px;
+    background:#3a4855;
+}
+@keyframes cgSignalTurn{
+    from{transform:rotateY(-20deg)}
+    to{transform:rotateY(340deg)}
+}
+@media(max-width:1100px){.cgStatusGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.cgStatusGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:460px){.cgStatusGrid{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+
+<!-- TOP COMMAND BAR -->
+<header class="topbar">
+    <div class="brand">
+        <div class="brandMark">🚦</div>
+        <div>
+            <h1>SMART TRAFFIC</h1>
+            <p>EMERGENCY PRIORITY COMMAND CENTER</p>
+        </div>
+    </div>
+
+    <div class="topRight">
+        <div class="clockWidget">
+            <div class="clockTime" id="liveClockTime">00:00:00</div>
+            <div class="clockDate" id="liveClockDate">-- --- ----</div>
+        </div>
+
+        <div class="systemBadge">
+            <div class="beaconDot"></div>
+            <span>SYSTEM ONLINE</span>
+        </div>
+
+        <div class="syncText" id="liveSyncText">Sync: 0s ago</div>
+    </div>
+</header>
+
+<!-- EMERGENCY ALERT BROADCAST BANNER -->
+<div class="emergBanner" id="emergencyBanner">
+    <div class="emergBannerLeft">
+        <div class="emergIcon">🚨</div>
+        <div>
+            <div class="emergTitle" id="emergBannerTitle">EMERGENCY PRIORITY OVERRIDE REQUEST</div>
+            <div class="emergSubtitle" id="emergBannerSub">Unit #--- approaching junction • Green wave active</div>
+        </div>
+    </div>
+    <div class="emergScoreTag" id="emergBannerScore">PRIORITY 90</div>
+</div>
+
+<main class="dashboard">
+
+    <!-- TOP REAL-TIME DYNAMIC METRIC CARDS (6 CARDS) -->
+    <section class="quickStats">
+        <div class="statCard">
+            <div class="statLabel">
+                <span>REGISTERED VEHICLES</span>
+                <span class="statTrend up" id="trendVehicles">↑ NORMAL</span>
+            </div>
+            <div class="statValue" id="statVehicles">0</div>
+            <div class="statSub">ARRAY STORAGE POOL</div>
+        </div>
+
+        <div class="statCard">
+            <div class="statLabel">
+                <span>EMERGENCY UNITS</span>
+                <span class="statTrend normal" id="trendEmerg">0 QUEUED</span>
+            </div>
+            <div class="statValue" style="color:var(--red)" id="statEmergency">0</div>
+            <div class="statSub">PRIORITY INTERRUPTS</div>
+        </div>
+
+        <div class="statCard">
+            <div class="statLabel">
+                <span>ACTIVE PRIORITY</span>
+                <span class="statTrend up" id="trendPrioTag">STANDBY</span>
+            </div>
+            <div class="statValue" style="color:var(--cyan);font-size:18px" id="statPriority">--</div>
+            <div class="statSub">TARGET REGISTRY</div>
+        </div>
+
+        <div class="statCard">
+            <div class="statLabel">
+                <span>AVG WAIT TIME</span>
+                <span class="statTrend up" id="trendWait">OPTIMAL</span>
+            </div>
+            <div class="statValue" style="color:var(--amber)" id="statAvgWait">0.0<span class="statUnit">s</span></div>
+            <div class="statSub">REAL-TIME TELEMETRY</div>
+        </div>
+
+        <div class="statCard">
+            <div class="statLabel">
+                <span>TRAFFIC DENSITY</span>
+                <span class="statTrend normal" id="trendDensityTag">MODERATE</span>
+            </div>
+            <div class="statValue" style="font-size:18px" id="statDensityVal">MODERATE</div>
+            <div class="statSub" id="statDensitySub">CAPACITY LOAD: 45%</div>
+        </div>
+
+        <div class="statCard">
+            <div class="statLabel">
+                <span>SYSTEM MODE</span>
+                <span class="statTrend normal" id="trendModeTag">AUTO</span>
+            </div>
+            <div class="statValue" style="font-size:15px;color:var(--green)" id="simState">AUTO / RUNNING</div>
+            <div class="statSub">DYNAMIC SIGNAL CYCLE</div>
+        </div>
+    </section>
+
+    <!-- 3-COLUMN MAIN LAYOUT -->
+    <div class="mainLayout">
+
+        <!-- LEFT COLUMN: VEHICLE CONTROL & DATA STRUCTURE CONTROLS -->
+        <div class="col">
+
+            <!-- VEHICLE CONTROL CARD -->
+            <section class="card">
+                <div class="cardHeader">
+                    <div class="cardTitle">
+                        <i>✦</i>
+                        <span>VEHICLE CONTROL</span>
+                    </div>
+                    <span class="tag">CRUD / PL</span>
+                </div>
+                <div class="cardBody">
+                    <div class="field">
+                        <label>VEHICLE ID</label>
+                        <input id="vehicleId" type="number" placeholder="e.g. 101">
+                    </div>
+                    <div class="field">
+                        <label>VEHICLE TYPE</label>
+                        <input id="vehicleType" type="text" placeholder="Car / Bike / Bus / Ambulance">
+                    </div>
+                    <div class="field">
+                        <label>EMERGENCY STATUS</label>
+                        <input id="emergency" type="text" placeholder="YES / NO">
+                    </div>
+                    <div class="field">
+                        <label>WAITING TIME (SECONDS)</label>
+                        <input id="waitTime" type="number" placeholder="e.g. 15">
+                    </div>
+
+                    <div class="btnGrid">
+                        <button class="btn-insert" onclick="insertVehicle()">+ INSERT</button>
+                        <button class="btn-update" onclick="updateVehicle()">UPDATE</button>
+                        <button class="btn-delete" onclick="deleteVehicle()">DELETE</button>
+                        <button class="btn-search" onclick="searchVehicle()">SEARCH</button>
+                        <button class="btn-display" onclick="displayVehicles()">DISPLAY</button>
+                        <button class="btn-clear" onclick="clearForm()">CLEAR</button>
+                    </div>
+
+                    <div class="prioControls">
+                        <button class="btn-start" onclick="startSimulation()">START PRIORITY</button>
+                        <button class="btn-stop" onclick="stopSimulation()">STOP</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DATA STRUCTURE INTERACTION & VISUALIZER -->
+            <section class="card">
+                <div class="cardHeader">
+                    <div class="cardTitle">
+                        <i>✦</i>
+                        <span>DATA STRUCTURE CONTROLS</span>
+                    </div>
+                    <span class="tag">PL / PSOOP</span>
+                </div>
+                <div class="cardBody dsSection">
+
+                    <!-- ARRAY -->
+                    <div class="dsCard">
+                        <div class="dsHeader">
+                            <span class="dsTitle">ARRAY STORAGE (CONTIGUOUS POOL)</span>
+                            <div class="dsActions"><span class="dsBadge">INDEXED</span></div>
+                        </div>
+                        <div class="dsBox" id="arrayVisual">
+                            <span class="dsEmpty">ARRAY EMPTY</span>
+                        </div>
+                    </div>
+
+                    <!-- LINKED LIST -->
+                    <div class="dsCard">
+                        <div class="dsHeader">
+                            <span class="dsTitle">LINKED LIST (ORDER OF ARRIVAL)</span>
+                            <div class="dsActions"><span class="dsBadge">INSERT / DELETE</span></div>
+                        </div>
+                        <div style="display:flex;gap:5px;margin-bottom:6px">
+                            <input id="llId" type="number" placeholder="ID" style="height:28px;font-size:9px">
+                            <button class="btn-insert" style="padding:0 9px;height:28px" onclick="llInsert()">ADD</button>
+                            <button class="btn-delete" style="padding:0 9px;height:28px" onclick="llDelete()">DEL</button>
+                        </div>
+                        <div class="dsBox" id="linkedListVisual">
+                            <span class="dsEmpty">HEAD → NULL</span>
+                        </div>
+                        <div id="llInfo" style="font-size:8px;color:var(--text-muted);margin-top:4px;font-family:var(--font-mono)">Ready.</div>
+                    </div>
+
+                    <!-- QUEUE & STACK -->
+                    <div class="dsCard">
+                        <div class="dsHeader">
+                            <span class="dsTitle">QUEUE (FIFO: NORMAL COMMUTERS)</span>
+                            <div class="dsActions"><span class="dsBadge">ENQUEUE / DEQUEUE</span></div>
+                        </div>
+                        <div style="display:flex;gap:5px;margin-bottom:6px">
+                            <input id="queueId" type="number" placeholder="Vehicle ID" style="height:28px;font-size:9px">
+                            <button class="btn-insert" style="padding:0 8px;height:28px" onclick="enqueueVehicle()">ENQUEUE</button>
+                            <button class="btn-clear" style="padding:0 8px;height:28px" onclick="dequeueVehicle()">DEQUEUE</button>
+                        </div>
+                        <div class="dsBox" id="queueVisual">
+                            <span class="dsEmpty">FRONT → EMPTY ← REAR</span>
+                        </div>
+                    </div>
+
+                    <div class="dsCard">
+                        <div class="dsHeader">
+                            <span class="dsTitle">STACK (LIFO: EMERGENCY INTERRUPTS)</span>
+                            <div class="dsActions"><span class="dsBadge">PUSH / POP</span></div>
+                        </div>
+                        <div style="display:flex;gap:5px;margin-bottom:6px">
+                            <input id="stackId" type="number" placeholder="Emerg ID" style="height:28px;font-size:9px">
+                            <button class="btn-update" style="padding:0 8px;height:28px" onclick="pushEmergency()">PUSH</button>
+                            <button class="btn-delete" style="padding:0 8px;height:28px" onclick="popEmergency()">POP</button>
+                        </div>
+                        <div class="dsBox" id="stackVisual">
+                            <span class="dsEmpty">TOP → EMPTY</span>
+                        </div>
+                        <div id="co3Info" style="font-size:8px;color:var(--text-muted);margin-top:4px;font-family:var(--font-mono)">Ready.</div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+        <!-- CENTER COLUMN: INTERACTIVE TRAFFIC JUNCTION CANVAS -->
+        <div class="col">
+
+            <section class="simBox">
+                <canvas id="trafficCanvas" class="simCanvas" width="600" height="500"></canvas>
+
+                <!-- TOP HUD OVERLAY -->
+                <div class="simOverlayTop">
+                    <div class="simModeTag" id="canvasModeBadge">MODE: AUTO / RUNNING</div>
+                    <div class="simSignalsBox">
+                        <div class="signalPill">
+                            <span class="sigDot green" id="sigDotEW"></span>
+                            <span>E/W: <b id="sigTextEW">GREEN 12s</b></span>
+                        </div>
+                        <div class="signalPill">
+                            <span class="sigDot red" id="sigDotNS"></span>
+                            <span>N/S: <b id="sigTextNS">RED 12s</b></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTTOM HUD OVERLAY -->
+                <div class="simHudBottom">
+                    <div>TELEMETRY: <span id="selectedInfo" style="color:var(--cyan);font-weight:700">Connecting...</span></div>
+                    <div style="color:var(--text-muted)">JUNCTION: <b style="color:var(--green)">CLEARWAY</b></div>
+                </div>
+            </section>
+
+            <!-- LIVE SYSTEM ACTIVITY LOG CARD -->
+            <section class="card">
+                <div class="cardHeader">
+                    <div class="cardTitle">
+                        <i>✦</i>
+                        <span>LIVE SYSTEM ACTIVITY</span>
+                    </div>
+                    <span class="tag">EVENT STREAM</span>
+                </div>
+                <div class="cardBody">
+                    <div class="activityFeed" id="activityFeed">
+                        <!-- Events injected here -->
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- RIGHT COLUMN: PROCESSOR / COA & PRIORITY CALCULATION -->
+        <div class="col">
+
+            <!-- PROCESSOR / COA SECTION -->
+            <section class="card">
+                <div class="cardHeader">
+                    <div class="cardTitle">
+                        <i>✦</i>
+                        <span>PROCESSOR / COA LOGIC</span>
+                    </div>
+                    <span class="tag">x86-64 HARDWARE</span>
+                </div>
+                <div class="cardBody">
+
+                    <!-- CPU REGISTERS -->
+                    <div style="font-size:8.5px;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-mono)">CPU REGISTERS</div>
+                    <div class="coaGrid">
+                        <div class="regBox" id="boxAX">
+                            <div class="regName">RAX (MUL)</div>
+                            <div class="regVal" id="AX">0</div>
+                        </div>
+                        <div class="regBox" id="boxBX">
+                            <div class="regName">RBX (WAIT)</div>
+                            <div class="regVal" id="BX">0</div>
+                        </div>
+                        <div class="regBox" id="boxCX">
+                            <div class="regName">RCX (PRIO)</div>
+                            <div class="regVal" id="CX">0</div>
+                        </div>
+                        <div class="regBox" id="boxDX">
+                            <div class="regName">RDX (GREEN)</div>
+                            <div class="regVal" id="DX">30s</div>
+                        </div>
+                    </div>
+
+                    <!-- PRIORITY MATH BREAKDOWN -->
+                    <div style="font-size:8.5px;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-mono)">PRIORITY CALCULATION BREAKDOWN</div>
+                    <div class="coaMathBox">
+                        <div class="mathRow">
+                            <span class="mathLabel">EMERGENCY BONUS:</span>
+                            <span class="mathVal" id="mathBonus">+0</span>
+                        </div>
+                        <div class="mathRow">
+                            <span class="mathLabel">WAIT TIME WEIGHT (×1):</span>
+                            <span class="mathVal" id="mathWait">+0</span>
+                        </div>
+                        <div class="mathRow">
+                            <span class="mathLabel">VEHICLE TYPE WEIGHT:</span>
+                            <span class="mathVal" id="mathType">+0</span>
+                        </div>
+                        <div class="mathRow">
+                            <span class="mathLabel">TRAFFIC DENSITY WEIGHT (×2):</span>
+                            <span class="mathVal" id="mathDensity">+0</span>
+                        </div>
+                        <div class="mathRow total">
+                            <span>TOTAL PRIORITY SCORE:</span>
+                            <span class="mathVal" id="mathTotal">0</span>
+                        </div>
+                    </div>
+
+                    <!-- RESULT -->
+                    <div class="aluResultCard">
+                        <div class="aluLeft">
+                            <small>COMPUTED PRIORITY</small>
+                            <div class="aluScore" id="priorityValue">0</div>
+                        </div>
+                        <div class="prioBadge" id="priorityState">NORMAL SIGNAL</div>
+                    </div>
+
+                    <!-- ASSEMBLY EMULATION CODE -->
+                    <div style="margin-top:10px;padding:9px;background:#060814;border:1px solid #1a1e34;border-radius:8px;font-family:var(--font-mono);font-size:8px;color:#a5accf;line-height:1.45">
+                        <span style="color:var(--purple)">MOV</span> RAX, [<span id="coaCount" style="color:var(--cyan)">0</span>] <span style="color:#575e80">; Fleet Density</span><br>
+                        <span style="color:var(--purple)">IMUL</span> RAX, 2 <span style="color:#575e80">; RAX = Count * 2</span><br>
+                        <span style="color:var(--purple)">ADD</span> RAX, [<span id="coaWait" style="color:var(--amber)">0</span>] <span style="color:#575e80">; + Wait Time</span><br>
+                        <span style="color:var(--purple)">CMP</span> [<span id="coaEmergency" style="color:var(--red)">NO</span>], YES <span style="color:#575e80">; Interrupt Check</span><br>
+                        <span style="color:var(--purple)">MOV</span> RCX, RAX <span style="color:#575e80">; Final Priority</span><br>
+                        <span style="color:var(--purple)">ADD</span> RDX, RCX <span style="color:#575e80">; Green wave extension</span>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         COMPUTER GRAPHICS / CG SECTION
+         CO1: Graphics Primitives  CO2: Transformations
+         CO3: Clipping             CO5: 3D Object + Viewport
+         ============================================================ -->
+    <section class="card cgPanel" id="cgPanelSection">
+        <div class="cardHeader">
+            <div class="cardTitle">
+                <i>✦</i>
+                <span>COMPUTER GRAPHICS / CG</span>
+            </div>
+            <a class="tag cgDemoLink" href="#trafficCanvas" aria-label="View the live traffic simulation">
+                <span id="cgDemoStatus">LIVE DEMO</span>
+            </a>
+        </div>
+        <div class="cardBody">
+            <div class="cgGrid">
+                
+                <!-- LEFT: Status Monitors -->
+                <div class="cgStatusGrid">
+                    
+                    <div class="cgBlock">
+                        <div class="cgBlockTitle">GRAPHICS USED – CO1</div>
+                        <div class="cgRow"><span class="cgLabel">Road / Lines</span><span class="cgVal green">DRAWN</span></div>
+                        <div class="cgRow"><span class="cgLabel">Traffic Signal</span><span class="cgVal green">DRAWN</span></div>
+                        <div class="cgRow"><span class="cgLabel">Vehicle Shapes</span><span class="cgVal green">DRAWN</span></div>
+                        <div class="cgRow"><span class="cgLabel">Zebra Crossing</span><span class="cgVal green">DRAWN</span></div>
+                    </div>
+                    
+                    <div class="cgBlock">
+                        <div class="cgBlockTitle">TRANSFORMATIONS – CO2</div>
+                        <div class="cgRow"><span class="cgLabel">Translation</span><span class="cgVal">Vehicle Moves</span></div>
+                        <div class="cgRow"><span class="cgLabel">Rotation</span><span class="cgVal">Direction Change</span></div>
+                        <div class="cgRow"><span class="cgLabel">Scaling</span><span class="cgVal">Object Size</span></div>
+                    </div>
+                    
+                    <div class="cgBlock">
+                        <div class="cgBlockTitle">CLIPPING – CO3</div>
+                        <div class="cgRow"><span class="cgLabel">Road / Junction Region</span><span class="cgVal green">DEFINED</span></div>
+                        <div class="cgRow"><span class="cgLabel">Clipping</span><span class="cgVal green">ACTIVE</span></div>
+                        <div class="cgRow"><span class="cgLabel">Vehicle in Region</span><span class="cgVal" id="cgCO3InRegion">---</span></div>
+                        <div class="cgRow"><span class="cgLabel">Status</span><span class="cgVal" id="cgCO3Status">---</span></div>
+                    </div>
+                    
+                    <div class="cgBlock">
+                        <div class="cgBlockTitle">3D OBJECT + VIEWPORT – CO5</div>
+                        <div class="cgRow"><span class="cgLabel">3D Object</span><span class="cgVal">Traffic Signal</span></div>
+                        <div class="cgRow"><span class="cgLabel">3D Rotation</span><span class="cgVal green">ACTIVE</span></div>
+                        <div class="cgRow"><span class="cgLabel">Angle</span><span class="cgVal" id="cgCO5Angle">0°</span></div>
+                        <div class="cgRow"><span class="cgLabel">Viewport</span><span class="cgVal">Dynamic / Responsive</span></div>
+                        <div class="cgRow"><span class="cgLabel">Adapts to</span><span class="cgVal">Window Resize</span></div>
+                    </div>
+                    
+                </div>
+                
+                <!-- RIGHT: Mini Canvases -->
+                <div class="cgCanvasCol">
+                    <div class="cgMiniWrap">
+                        <div class="cgMiniTitle">CLIPPING DEMO – CO3</div>
+                        <canvas id="cgClipCanvas" class="cgMiniCanvas" width="360" height="140"></canvas>
+                    </div>
+                    <div class="cgMiniWrap">
+                        <div class="cgMiniTitle">3D TRAFFIC SIGNAL – CO5</div>
+                        <canvas id="cg3DCanvas" class="cgMiniCanvas" width="360" height="140"></canvas>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- VEHICLE DATABASE TABLE CARD WITH FILTERS -->
+    <section class="card tableCard">
+        <div class="cardHeader">
+            <div class="cardTitle">
+                <i>✦</i>
+                <span>VEHICLE DATABASE</span>
+            </div>
+            <span class="tag">REAL-TIME ARRAY STORAGE</span>
+        </div>
+
+        <!-- TOOLBAR: FILTER PILLS + SEARCH -->
+        <div class="tableToolbar">
+            <div class="filterPills">
+                <button class="filterBtn active" onclick="setFilter('ALL', this)">All</button>
+                <button class="filterBtn" onclick="setFilter('NORMAL', this)">Normal</button>
+                <button class="filterBtn" onclick="setFilter('EMERGENCY', this)">Emergency</button>
+                <button class="filterBtn" onclick="setFilter('WAITING', this)">Waiting</button>
+                <button class="filterBtn" onclick="setFilter('PRIORITY', this)">Priority</button>
+            </div>
+            <input type="text" id="tableFilterInput" class="tableSearchBox" placeholder="Filter by ID/Type..." oninput="displayVehicles()">
+        </div>
+
+        <div class="tableWrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>VEHICLE ID</th>
+                        <th>TYPE</th>
+                        <th>EMERGENCY</th>
+                        <th>WAIT TIME</th>
+                        <th>PRIORITY SCORE</th>
+                        <th>STATUS</th>
+                        <th>LAST UPDATED</th>
+                    </tr>
+                </thead>
+                <tbody id="vehicleTable">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- MISSION STATUS BANNER -->
+    <div class="missionBanner">
+        <div>COMMAND LOG: <b id="missionStatus" style="color:#fff;margin-left:6px">System operational.</b></div>
+        <div style="color:var(--text-muted);font-family:var(--font-mono)">FRAME: <span style="color:var(--green)">60 FPS</span> | ENGINE: <span style="color:var(--cyan)">COA-x86_64</span></div>
+    </div>
+
+</main>
+
+<!-- TOAST CONTAINER -->
+<div id="toastContainer"></div>
+
+<!-- CONFIRMATION MODAL -->
+<div class="modalOverlay" id="deleteModal">
+    <div class="modalDialog">
+        <div class="modalTitle">CONFIRM VEHICLE DELETION</div>
+        <div class="modalMsg" id="deleteModalMsg">Are you sure you want to delete vehicle 101 from the traffic network?</div>
+        <div class="modalActions">
+            <button class="btn-clear" onclick="closeDeleteModal()">Cancel</button>
+            <button class="btn-delete" onclick="confirmDeleteVehicle()">Delete Vehicle</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     SIMULATION ENGINE & CONTROLLER LOGIC (PURE MODULAR JAVASCRIPT)
+     ========================================================================== -->
+<script>
+// Master State & Synchronized Data Structures
+let vehicles = [];
+let linkedList = [];
+let queue = [];
+let emergencyStack = [];
+let selectedId = null;
+let simulationRunning = true;
+let nextVehicleId = 109;
+let completedCount = 0;
+let pendingDeleteId = null;
+let activeFilter = "ALL";
+let lastSyncSeconds = 0;
+
+// State Machine Timers & Durations
+let trafficMode = "NORMAL"; // "NORMAL" | "EMERGENCY"
+let signalState = "EW_GREEN";
+let signalTimer = 12.0;
+let activeEmergencyId = null;
+let emergencyResumePhase = "NS_GREEN";
+let spawnCountdown = 3.0;
+let animationFrameId = null;
+let lastTime = performance.now();
+
+const PHASE_DURATIONS = {
+    EW_GREEN: 12.0,
+    EW_YELLOW: 3.0,
+    ALL_RED_1: 2.0,
+    NS_GREEN: 12.0,
+    NS_YELLOW: 3.0,
+    ALL_RED_2: 2.0,
+    ALL_RED_EMERGENCY: 1.0,
+    CLEARANCE_POST_EMERGENCY: 1.5
+};
+
+const canvas = document.getElementById("trafficCanvas");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas(){
+    if (!canvas) return;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+
+// Lane configuration helper
+function getLaneConfig(laneKey) {
+    const w = canvas ? canvas.width : 600;
+    const h = canvas ? canvas.height : 500;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    switch(laneKey) {
+        case "EW_EB":
+            return {
+                lane: "EW_EB",
+                direction: "EW",
+                heading: "EAST",
+                vx: 1, vy: 0,
+                startX: -45,
+                startY: cy - 32,
+                stopLine: cx - 95,
+                exitCheck: (x, y) => x > w + 55
+            };
+        case "NS_SB":
+            return {
+                lane: "NS_SB",
+                direction: "NS",
+                heading: "SOUTH",
+                vx: 0, vy: 1,
+                startX: cx + 32,
+                startY: -45,
+                stopLine: cy - 95,
+                exitCheck: (x, y) => y > h + 55
+            };
+        case "EW_WB":
+            return {
+                lane: "EW_WB",
+                direction: "EW",
+                heading: "WEST",
+                vx: -1, vy: 0,
+                startX: w + 45,
+                startY: cy + 32,
+                stopLine: cx + 95,
+                exitCheck: (x, y) => x < -55
+            };
+        case "NS_NB":
+            return {
+                lane: "NS_NB",
+                direction: "NS",
+                heading: "NORTH",
+                vx: 0, vy: -1,
+                startX: cx - 32,
+                startY: h + 45,
+                stopLine: cy + 95,
+                exitCheck: (x, y) => y < -55
+            };
+        default:
+            return getLaneConfig("EW_EB");
+    }
+}
+
+// Vehicle Class
+class SimulationVehicle {
+    constructor(id, type, emergency, waitTime, laneKey) {
+        this.id = Number(id);
+        this.type = type || "Car";
+        this.emergency = Boolean(emergency);
+        this.wait = Number(waitTime) || 10;
+        this.status = this.emergency ? "EMERGENCY" : "READY";
+        this.lane = laneKey || "EW_EB";
+        this.hasCrossed = false;
+        this.state = "ENTERING";
+        this.lastUpdated = new Date().toLocaleTimeString();
+
+        const cfg = getLaneConfig(this.lane);
+        this.direction = cfg.direction;
+        this.heading = cfg.heading;
+        this.vx = cfg.vx;
+        this.vy = cfg.vy;
+        this.x = cfg.startX;
+        this.y = cfg.startY;
+
+        this.lateralOffset = 0;
+        this.targetLateral = 0;
+        this.steerAngle = 0;
+
+        // Auto-detect emergency type
+        if (/ambulance|fire|police/i.test(this.type)) {
+            this.emergency = true;
+        }
+
+        // Vehicle dimensions & performance specs
+        if (this.emergency) {
+            this.maxSpeed = 3.8;
+            this.length = 30;
+            this.width = 17;
+            this.color = "#ff4d5e";
+        } else if (/auto|rickshaw/i.test(this.type)) {
+            this.maxSpeed = 2.0;
+            this.length = 22;
+            this.width = 14;
+            this.color = "#ffb300";
+        } else if (/bike|motorcycle/i.test(this.type)) {
+            this.maxSpeed = 2.5;
+            this.length = 20;
+            this.width = 10;
+            this.color = "#ff7043";
+        } else if (/bus/i.test(this.type)) {
+            this.maxSpeed = 1.6;
+            this.length = 42;
+            this.width = 19;
+            this.color = "#7e57c2";
+        } else if (/truck/i.test(this.type)) {
+            this.maxSpeed = 1.5;
+            this.length = 40;
+            this.width = 18;
+            this.color = "#00897b";
+        } else {
+            this.maxSpeed = 2.2;
+            this.length = 28;
+            this.width = 16;
+            const carPalette = ["#35d6ff", "#42a5f5", "#26c6da", "#ef5350", "#ab47bc"];
+            this.color = carPalette[this.id % carPalette.length];
+        }
+        this.speed = this.maxSpeed;
+    }
+}
+
+// ==========================================
+// TOAST NOTIFICATION COMPONENT
+// ==========================================
+function showToast(type, title, message) {
+    const container = document.getElementById("toastContainer");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+
+    let icon = "ℹ";
+    if (type === "success") icon = "✓";
+    else if (type === "warning") icon = "⚠";
+    else if (type === "error") icon = "✕";
+    else if (type === "emergency") icon = "🚨";
+
+    toast.innerHTML = `
+        <div class="toastIcon">${icon}</div>
+        <div class="toastBody">
+            <div class="toastTitle">${title}</div>
+            <div class="toastMsg">${message}</div>
+        </div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(50px)";
+        setTimeout(() => toast.remove(), 300);
+    }, 3800);
+}
+
+// ==========================================
+// ACTIVITY LOGGER
+// ==========================================
+function logActivity(type, message) {
+    const feed = document.getElementById("activityFeed");
+    if (!feed) return;
+
+    const now = new Date();
+    const timeStr = now.toTimeString().split(" ")[0];
+
+    const item = document.createElement("div");
+    item.className = `activityItem ${type}`;
+
+    let tag = "SYS";
+    if (type === "insert") tag = "REG";
+    else if (type === "delete") tag = "DEL";
+    else if (type === "prio") tag = "PRIO";
+    else if (type === "update") tag = "UPD";
+
+    item.innerHTML = `
+        <span class="actTime">${timeStr}</span>
+        <span class="actTag">${tag}</span>
+        <span>${message}</span>
+    `;
+
+    feed.insertBefore(item, feed.firstChild);
+    while (feed.children.length > 12) {
+        feed.removeChild(feed.lastChild);
+    }
+}
+
+// ==========================================
+// REAL-TIME CLOCK & SYNC TIMER
+// ==========================================
+function updateClock() {
+    const now = new Date();
+    const timeElem = document.getElementById("liveClockTime");
+    const dateElem = document.getElementById("liveClockDate");
+    const syncElem = document.getElementById("liveSyncText");
+
+    if (timeElem) timeElem.innerText = now.toTimeString().split(" ")[0];
+    if (dateElem) {
+        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        dateElem.innerText = `${String(now.getDate()).padStart(2, '0')} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    }
+
+    lastSyncSeconds++;
+    if (syncElem) syncElem.innerText = `Sync: ${lastSyncSeconds}s ago`;
+}
+setInterval(updateClock, 1000);
+
+function markSynced() {
+    lastSyncSeconds = 0;
+    const syncElem = document.getElementById("liveSyncText");
+    if (syncElem) syncElem.innerText = "Sync: just now";
+}
+
+// ==========================================
+// PRIORITY SCORE CALCULATION
+// ==========================================
+function calculatePriorityScore(v) {
+    if (!v) return 0;
+
+    const emergencyBonus = v.emergency ? 50 : 0;
+    const waitWeight = Math.min(v.wait, 30);
+
+    let typeWeight = 5;
+    if (/ambulance/i.test(v.type)) typeWeight = 25;
+    else if (/fire/i.test(v.type)) typeWeight = 30;
+    else if (/police/i.test(v.type)) typeWeight = 20;
+    else if (/bus/i.test(v.type)) typeWeight = 15;
+    else if (/truck/i.test(v.type)) typeWeight = 10;
+    else if (/bike/i.test(v.type)) typeWeight = 2;
+
+    const densityWeight = Math.min(vehicles.length * 2, 20);
+
+    return emergencyBonus + waitWeight + typeWeight + densityWeight;
+}
+
+// ==========================================
+// SIGNALS & EMERGENCY CONTROLLER
+// ==========================================
+function getSignalColor(direction) {
+    if (direction === "EW") {
+        if (signalState === "EW_GREEN" || signalState === "EMERGENCY_EW_GREEN") return "GREEN";
+        if (signalState === "EW_YELLOW") return "YELLOW";
+        return "RED";
+    } else {
+        if (signalState === "NS_GREEN" || signalState === "EMERGENCY_NS_GREEN") return "GREEN";
+        if (signalState === "NS_YELLOW") return "YELLOW";
+        return "RED";
+    }
+}
+
+function updateSignals(dt) {
+    if (trafficMode === "EMERGENCY") {
+        const ev = vehicles.find(v => v.id === activeEmergencyId && v.emergency);
+        if (!ev) {
+            endEmergencyPriority();
+            return;
+        }
+
+        if (signalState === "NS_YELLOW" || signalState === "EW_YELLOW") {
+            signalTimer -= dt;
+            if (signalTimer <= 0) {
+                signalState = "ALL_RED_EMERGENCY";
+                signalTimer = PHASE_DURATIONS.ALL_RED_EMERGENCY;
+            }
+        } else if (signalState === "ALL_RED_EMERGENCY") {
+            signalTimer -= dt;
+            if (signalTimer <= 0) {
+                signalState = (ev.direction === "EW") ? "EMERGENCY_EW_GREEN" : "EMERGENCY_NS_GREEN";
+                signalTimer = 99;
+            }
+        } else if (signalState === "EMERGENCY_EW_GREEN" || signalState === "EMERGENCY_NS_GREEN") {
+            if (ev.hasCrossed) {
+                signalState = "CLEARANCE_POST_EMERGENCY";
+                signalTimer = PHASE_DURATIONS.CLEARANCE_POST_EMERGENCY;
+                document.getElementById("missionStatus").innerText =
+                    `Emergency vehicle ${ev.id} cleared junction. Resuming normal traffic.`;
+            }
+        } else if (signalState === "CLEARANCE_POST_EMERGENCY") {
+            signalTimer -= dt;
+            if (signalTimer <= 0) {
+                endEmergencyPriority();
+            }
+        }
+        return;
+    }
+
+    // Normal Cycle
+    signalTimer -= dt;
+    if (signalTimer <= 0) {
+        switch (signalState) {
+            case "EW_GREEN":
+                signalState = "EW_YELLOW";
+                signalTimer = PHASE_DURATIONS.EW_YELLOW;
+                logActivity("sig", "East/West switched to YELLOW");
+                break;
+            case "EW_YELLOW":
+                signalState = "ALL_RED_1";
+                signalTimer = PHASE_DURATIONS.ALL_RED_1;
+                break;
+            case "ALL_RED_1":
+                signalState = "NS_GREEN";
+                signalTimer = PHASE_DURATIONS.NS_GREEN;
+                logActivity("sig", "North/South signal GREEN");
+                break;
+            case "NS_GREEN":
+                signalState = "NS_YELLOW";
+                signalTimer = PHASE_DURATIONS.NS_YELLOW;
+                logActivity("sig", "North/South switched to YELLOW");
+                break;
+            case "NS_YELLOW":
+                signalState = "ALL_RED_2";
+                signalTimer = PHASE_DURATIONS.ALL_RED_2;
+                break;
+            case "ALL_RED_2":
+            default:
+                signalState = "EW_GREEN";
+                signalTimer = PHASE_DURATIONS.EW_GREEN;
+                logActivity("sig", "East/West signal GREEN");
+                break;
+        }
+    }
+}
+
+function triggerEmergencyPriority(vehicleId) {
+    const v = vehicles.find(x => x.id === vehicleId && x.emergency);
+    if (!v) return;
+
+    activeEmergencyId = v.id;
+    trafficMode = "EMERGENCY";
+    v.status = "PRIORITY ACTIVE";
+
+    // Freeze ALL normal vehicles safely
+    vehicles.forEach(veh => {
+        if (!veh.emergency) {
+            veh.speed = 0;
+            veh.state = "STOPPED_FOR_EMERGENCY";
+            veh.status = "STOPPED";
+        }
+    });
+
+    const prioScore = calculatePriorityScore(v);
+
+    // Show Emergency Banner
+    const banner = document.getElementById("emergencyBanner");
+    if (banner) {
+        banner.classList.add("active");
+        document.getElementById("emergBannerTitle").innerText = `EMERGENCY PRIORITY OVERRIDE: ${v.type.toUpperCase()} #${v.id}`;
+        document.getElementById("emergBannerSub").innerText = `Approaching ${v.heading}bound • Route cleared through junction`;
+        document.getElementById("emergBannerScore").innerText = `PRIORITY ${prioScore}`;
+    }
+
+    document.getElementById("simState").innerText = "EMERGENCY PRIORITY";
+    document.getElementById("simState").style.color = "var(--red)";
+    document.getElementById("missionStatus").innerText =
+        `🚨 EMERGENCY PRIORITY ACTIVE: ${v.type.toUpperCase()} ${v.id} (${v.heading}BOUND) → All normal traffic STOPPED.`;
+
+    const targetDir = v.direction;
+    const conflictingDir = (targetDir === "EW") ? "NS" : "EW";
+
+    if (getSignalColor(conflictingDir) === "GREEN") {
+        signalState = (conflictingDir === "EW") ? "EW_YELLOW" : "NS_YELLOW";
+        signalTimer = 1.4;
+        emergencyResumePhase = (conflictingDir === "EW") ? "EW_GREEN" : "NS_GREEN";
+    } else if (getSignalColor(conflictingDir) === "YELLOW") {
+        signalTimer = Math.min(signalTimer, 1.0);
+    } else {
+        signalState = (targetDir === "EW") ? "EMERGENCY_EW_GREEN" : "EMERGENCY_NS_GREEN";
+        signalTimer = 99;
+    }
+
+    selectedId = v.id;
+    showToast("emergency", "EMERGENCY PRIORITY ACTIVE", `${v.type} #${v.id} (${v.heading}bound) granted priority clearance.`);
+    logActivity("prio", `Priority override: ${v.type} #${v.id} Score: ${prioScore}`);
+
+    updateCOA();
+    displayVehicles();
+    updateDashboardStats();
+    markSynced();
+}
+
+function endEmergencyPriority() {
+    // Check if another emergency vehicle is pending in stack
+    if (emergencyStack.length > 0) {
+        const nextId = emergencyStack[emergencyStack.length - 1];
+        const nextEv = vehicles.find(v => v.id === nextId && v.emergency);
+        if (nextEv && nextEv.id !== activeEmergencyId) {
+            triggerEmergencyPriority(nextEv.id);
+            return;
+        }
+    }
+
+    trafficMode = "NORMAL";
+    activeEmergencyId = null;
+    signalState = emergencyResumePhase || "NS_GREEN";
+    signalTimer = PHASE_DURATIONS[signalState] || 12.0;
+
+    const banner = document.getElementById("emergencyBanner");
+    if (banner) banner.classList.remove("active");
+
+    document.getElementById("simState").innerText = "AUTO / RUNNING";
+    document.getElementById("simState").style.color = "var(--green)";
+    document.getElementById("missionStatus").innerText =
+        "EMERGENCY CLEARED — RESUMING NORMAL TRAFFIC FLOW.";
+
+    // Release normal vehicles
+    vehicles.forEach(v => {
+        if (!v.emergency) {
+            v.state = "APPROACHING";
+            v.status = "READY";
+        }
+    });
+
+    showToast("success", "Priority Mode Completed", "Normal automatic signal cycling restored.");
+    logActivity("prio", "Emergency clearance completed. Traffic normalized.");
+
+    updateCOA();
+    displayVehicles();
+    updateDashboardStats();
+    markSynced();
+}
+
+// Emergency Vehicle Dodging / Overtaking System
+function updateEmergencyDodge(ev, dt) {
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    const nominalLanePos = {
+        "EW_EB": cy - 32,
+        "EW_WB": cy + 32,
+        "NS_SB": cx + 32,
+        "NS_NB": cx - 32
+    };
+
+    const dodgeOffset = {
+        "EW_EB": 22,
+        "EW_WB": -22,
+        "NS_SB": -22,
+        "NS_NB": 22
+    };
+
+    let blockerAhead = null;
+    let minGap = 9999;
+
+    vehicles.forEach(other => {
+        if (other.id === ev.id || other.emergency) return;
+        if (other.lane === ev.lane) {
+            let gap = 9999;
+            if (ev.lane === "EW_EB") gap = other.x - ev.x;
+            else if (ev.lane === "EW_WB") gap = ev.x - other.x;
+            else if (ev.lane === "NS_SB") gap = other.y - ev.y;
+            else if (ev.lane === "NS_NB") gap = ev.y - other.y;
+
+            if (gap > -20 && gap < 110) {
+                if (gap < minGap) {
+                    minGap = gap;
+                    blockerAhead = other;
+                }
+            }
+        }
+    });
+
+    if (blockerAhead && minGap < 95) {
+        ev.targetLateral = dodgeOffset[ev.lane] || 0;
+        ev.state = (minGap > 30) ? "DODGING" : "OVERTAKING";
+    } else {
+        ev.targetLateral = 0;
+        if (Math.abs(ev.lateralOffset) > 2) {
+            ev.state = "OVERTAKING";
+        } else {
+            ev.state = ev.hasCrossed ? "EXITING" : (isInsideJunction(ev) ? "CROSSING" : "MOVING");
+        }
+    }
+
+    const steerRate = 0.09;
+    ev.lateralOffset += (ev.targetLateral - ev.lateralOffset) * steerRate;
+    if (Math.abs(ev.lateralOffset - ev.targetLateral) < 0.2) {
+        ev.lateralOffset = ev.targetLateral;
+    }
+
+    if (ev.lane === "EW_EB" || ev.lane === "EW_WB") {
+        ev.y = nominalLanePos[ev.lane] + ev.lateralOffset;
+    } else {
+        ev.x = nominalLanePos[ev.lane] + ev.lateralOffset;
+    }
+
+    const latDelta = ev.targetLateral - ev.lateralOffset;
+    ev.steerAngle = Math.max(-0.25, Math.min(0.25, latDelta * 0.02));
+
+    ev.speed = ev.maxSpeed;
+    ev.x += ev.vx * ev.speed;
+    ev.y += ev.vy * ev.speed;
+}
+
+function isInsideJunction(v) {
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    return (v.x >= cx - 95 && v.x <= cx + 95 && v.y >= cy - 95 && v.y <= cy + 95);
+}
+
+// Vehicle physics and update loop
+function updateVehicles(dt) {
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    const toRemove = [];
+
+    vehicles.forEach(v => {
+        if (!v.hasCrossed) {
+            if (v.lane === "EW_EB" && v.x > cx + 110) v.hasCrossed = true;
+            else if (v.lane === "EW_WB" && v.x < cx - 110) v.hasCrossed = true;
+            else if (v.lane === "NS_SB" && v.y > cy + 110) v.hasCrossed = true;
+            else if (v.lane === "NS_NB" && v.y < cy - 110) v.hasCrossed = true;
+        }
+
+        if (trafficMode === "EMERGENCY") {
+            if (!v.emergency) {
+                v.speed = 0;
+                v.state = "STOPPED_FOR_EMERGENCY";
+                v.status = "STOPPED";
+                return;
+            } else {
+                updateEmergencyDodge(v, dt);
+                const cfg = getLaneConfig(v.lane);
+                if (cfg.exitCheck(v.x, v.y)) {
+                    toRemove.push(v.id);
+                }
+                return;
+            }
+        }
+
+        // Normal Traffic
+        let leadDist = 9999;
+        let leadSpeed = v.maxSpeed;
+
+        vehicles.forEach(other => {
+            if (other.id === v.id || other.lane !== v.lane) return;
+
+            let dist = 9999;
+            if (v.lane === "EW_EB" && other.x > v.x) dist = other.x - v.x;
+            else if (v.lane === "EW_WB" && other.x < v.x) dist = v.x - other.x;
+            else if (v.lane === "NS_SB" && other.y > v.y) dist = other.y - v.y;
+            else if (v.lane === "NS_NB" && other.y < v.y) dist = v.y - other.y;
+
+            if (dist < leadDist) {
+                leadDist = dist;
+                leadSpeed = other.speed;
+            }
+        });
+
+        let signalDist = 9999;
+        if (!v.hasCrossed) {
+            let distToStop = 9999;
+            if (v.lane === "EW_EB") distToStop = (cx - 95 - 18) - v.x;
+            else if (v.lane === "EW_WB") distToStop = v.x - (cx + 95 + 18);
+            else if (v.lane === "NS_SB") distToStop = (cy - 95 - 18) - v.y;
+            else if (v.lane === "NS_NB") distToStop = v.y - (cy + 95 + 18);
+
+            if (distToStop > -10) {
+                const sig = getSignalColor(v.direction);
+                if (sig === "RED") {
+                    signalDist = Math.max(0, distToStop);
+                } else if (sig === "YELLOW") {
+                    if (distToStop > 40) {
+                        signalDist = distToStop;
+                    }
+                }
+            }
+        }
+
+        const safeGap = (v.type === "Bus" || v.type === "Truck") ? 48 : 38;
+        const obsDist = Math.min(leadDist, signalDist);
+        let targetSpeed = v.maxSpeed;
+
+        if (obsDist <= safeGap) {
+            targetSpeed = 0;
+            v.state = "WAITING";
+            v.status = "WAITING";
+        } else if (obsDist < 88) {
+            const factor = (obsDist - safeGap) / (88 - safeGap);
+            targetSpeed = Math.min(v.maxSpeed * factor, leadSpeed);
+            v.state = "APPROACHING";
+            v.status = "DECELERATING";
+        } else {
+            targetSpeed = v.maxSpeed;
+            v.state = v.hasCrossed ? "EXITING" : (isInsideJunction(v) ? "CROSSING" : "MOVING");
+            v.status = (v.state === "CROSSING") ? "CROSSING" : "MOVING";
+        }
+
+        if (v.speed < targetSpeed) {
+            v.speed = Math.min(targetSpeed, v.speed + 0.08);
+        } else if (v.speed > targetSpeed) {
+            v.speed = Math.max(targetSpeed, v.speed - 0.2);
+        }
+        if (v.speed < 0.04 && targetSpeed === 0) v.speed = 0;
+
+        v.x += v.vx * v.speed;
+        v.y += v.vy * v.speed;
+
+        const cfg = getLaneConfig(v.lane);
+        if (cfg.exitCheck(v.x, v.y)) {
+            toRemove.push(v.id);
+        }
+    });
+
+    if (toRemove.length > 0) {
+        toRemove.forEach(id => {
+            const exitingVeh = vehicles.find(x => x.id === id);
+            removeVehicleFromSystem(id);
+            completedCount++;
+            if (exitingVeh) {
+                logActivity("delete", `Vehicle ${id} (${exitingVeh.type}) cleared junction.`);
+            }
+        });
+        displayVehicles();
+        renderAllDataStructures();
+        updateCOA();
+        updateDashboardStats();
+    }
+}
+
+function removeVehicleFromSystem(id) {
+    vehicles = vehicles.filter(v => v.id !== id);
+    linkedList = linkedList.filter(x => x !== id);
+    queue = queue.filter(x => x !== id);
+    emergencyStack = emergencyStack.filter(x => x !== id);
+
+    if (activeEmergencyId === id) {
+        endEmergencyPriority();
+    }
+
+    if (selectedId === id) {
+        selectedId = vehicles.length > 0 ? vehicles[0].id : null;
+    }
+}
+
+// Spawner: periodically generates new unique vehicles across all 4 directions
+function updateSpawner(dt) {
+    spawnCountdown -= dt;
+    if (spawnCountdown <= 0) {
+        spawnCountdown = 2.5 + Math.random() * 2.0;
+
+        if (vehicles.length < 8 && trafficMode === "NORMAL") {
+            const lanePool = ["EW_EB", "NS_SB", "EW_WB", "NS_NB"];
+            const chosenLane = lanePool[Math.floor(Math.random() * lanePool.length)];
+
+            const cfg = getLaneConfig(chosenLane);
+            let hasBlocker = false;
+
+            vehicles.forEach(v => {
+                if (v.lane !== chosenLane) return;
+                const d = Math.hypot(v.x - cfg.startX, v.y - cfg.startY);
+                if (d < 75) hasBlocker = true;
+            });
+
+            if (!hasBlocker) {
+                const types = ["Car", "Bike", "Bus", "Auto-rickshaw", "Truck", "Car", "Bike"];
+                const type = types[Math.floor(Math.random() * types.length)];
+                const newId = nextVehicleId++;
+                const waitTime = Math.floor(Math.random() * 20) + 5;
+
+                const newVeh = new SimulationVehicle(newId, type, false, waitTime, chosenLane);
+                vehicles.push(newVeh);
+                linkedList.push(newId);
+                queue.push(newId);
+
+                displayVehicles();
+                renderAllDataStructures();
+                updateDashboardStats();
+                logActivity("insert", `Vehicle ${newId} (${type}) spawned into ${newVeh.heading} lane`);
+            }
+        }
+    }
+}
+
+// ==========================================
+// ROAD, ROUTE HIGHLIGHT & VEHICLE RENDERING
+// ==========================================
+function render() {
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // 1. Natural Environment Background
+    ctx.fillStyle = "#09100d";
+    ctx.fillRect(0, 0, w, h);
+
+    // Subtle grass grid pattern
+    ctx.strokeStyle = "rgba(45, 80, 60, 0.12)";
+    ctx.lineWidth = 1;
+    for (let x = 0; x < w; x += 45) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+    }
+    for (let y = 0; y < h; y += 45) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+    }
+
+    // 2. Sidewalk / Pavement Borders
+    ctx.fillStyle = "#27313a";
+    ctx.fillRect(0, cy - 73, w, 8);
+    ctx.fillRect(0, cy + 65, w, 8);
+    ctx.fillRect(cx - 73, 0, 8, h);
+    ctx.fillRect(cx + 65, 0, 8, h);
+
+    // 3. Dark Asphalt Road Surface
+    ctx.fillStyle = "#1c2228";
+    ctx.fillRect(0, cy - 65, w, 130);
+    ctx.fillRect(cx - 65, 0, 130, h);
+
+    // 4. Emergency Priority Route Highlight Corridor (When priority active)
+    if (trafficMode === "EMERGENCY" && activeEmergencyId) {
+        const ev = vehicles.find(v => v.id === activeEmergencyId);
+        if (ev) {
+            ctx.save();
+            ctx.fillStyle = "rgba(255, 77, 94, 0.14)";
+            if (ev.direction === "EW") {
+                ctx.fillRect(0, cy - 65, w, 65); // Eastbound upper half corridor
+            } else {
+                ctx.fillRect(cx, 0, 65, h);      // Southbound right half corridor
+            }
+
+            // Animated light flow along corridor
+            ctx.strokeStyle = "rgba(255, 77, 94, 0.6)";
+            ctx.lineWidth = 3;
+            ctx.setLineDash([18, 14]);
+            ctx.lineDashOffset = -(Date.now() / 25) % 32;
+            ctx.beginPath();
+            if (ev.direction === "EW") {
+                ctx.moveTo(0, cy - 32); ctx.lineTo(w, cy - 32);
+            } else {
+                ctx.moveTo(cx + 32, 0); ctx.lineTo(cx + 32, h);
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    // Outer boundary curbs
+    ctx.strokeStyle = "#414f5c";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, cy - 65); ctx.lineTo(w, cy - 65);
+    ctx.moveTo(0, cy + 65); ctx.lineTo(w, cy + 65);
+    ctx.moveTo(cx - 65, 0); ctx.lineTo(cx - 65, h);
+    ctx.moveTo(cx + 65, 0); ctx.lineTo(cx + 65, h);
+    ctx.stroke();
+
+    // Solid white road edge lines
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, cy - 62); ctx.lineTo(cx - 95, cy - 62);
+    ctx.moveTo(cx + 95, cy - 62); ctx.lineTo(w, cy - 62);
+    ctx.moveTo(0, cy + 62); ctx.lineTo(cx - 95, cy + 62);
+    ctx.moveTo(cx + 95, cy + 62); ctx.lineTo(w, cy + 62);
+    ctx.moveTo(cx - 62, 0); ctx.lineTo(cx - 62, cy - 95);
+    ctx.moveTo(cx - 62, cy + 95); ctx.lineTo(cx - 62, h);
+    ctx.moveTo(cx + 62, 0); ctx.lineTo(cx + 62, cy - 95);
+    ctx.moveTo(cx + 62, cy + 95); ctx.lineTo(cx + 62, h);
+    ctx.stroke();
+
+    // Yellow Center Dividers (Dashed lines)
+    ctx.strokeStyle = "#ffc83b";
+    ctx.setLineDash([14, 12]);
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(0, cy); ctx.lineTo(cx - 95, cy);
+    ctx.moveTo(cx + 95, cy); ctx.lineTo(w, cy);
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, cy - 95);
+    ctx.moveTo(cx, cy + 95); ctx.lineTo(cx, h);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Zebra Crossings (Pedestrian Stripes)
+    drawZebra(cx - 95 - 20, cy - 65, 16, 130, "V");
+    drawZebra(cx + 95 + 4, cy - 65, 16, 130, "V");
+    drawZebra(cx - 65, cy - 95 - 20, 130, 16, "H");
+    drawZebra(cx - 65, cy + 95 + 4, 130, 16, "H");
+
+    // Crisp White Stop Lines
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(cx - 95, cy - 65); ctx.lineTo(cx - 95, cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx + 95, cy); ctx.lineTo(cx + 95, cy + 65); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, cy - 95); ctx.lineTo(cx + 65, cy - 95); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - 65, cy + 95); ctx.lineTo(cx, cy + 95); ctx.stroke();
+
+    // Directional Lane Arrows
+    drawLaneArrow(cx - 145, cy - 32, "EAST");
+    drawLaneArrow(cx + 145, cy + 32, "WEST");
+    drawLaneArrow(cx + 32, cy - 145, "SOUTH");
+    drawLaneArrow(cx - 32, cy + 145, "NORTH");
+
+    // Traffic Signals
+    drawSignalHead(cx + 105, cy - 135, "EAST/WEST", getSignalColor("EW"));
+    drawSignalHead(cx - 155, cy - 135, "NORTH/SOUTH", getSignalColor("NS"));
+
+    // Vehicles
+    vehicles.forEach(v => drawVehicle(v));
+
+    // Update Overlay Texts
+    updateCanvasOverlays();
+}
+
+function drawZebra(x, y, w, h, orient) {
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    if (orient === "V") {
+        for (let py = y + 4; py < y + h - 6; py += 12) {
+            ctx.fillRect(x, py, w, 6);
+        }
+    } else {
+        for (let px = x + 4; px < x + w - 6; px += 12) {
+            ctx.fillRect(px, y, 6, h);
+        }
+    }
+}
+
+function drawLaneArrow(x, y, direction) {
+    ctx.save();
+    ctx.translate(x, y);
+    const angle = (direction === "EAST") ? 0 : (direction === "WEST" ? Math.PI : (direction === "SOUTH" ? Math.PI / 2 : -Math.PI / 2));
+    ctx.rotate(angle);
+    ctx.fillStyle = "rgba(255,255,255,0.45)";
+    ctx.fillRect(-10, -2, 14, 4);
+    ctx.beginPath();
+    ctx.moveTo(4, -6);
+    ctx.lineTo(12, 0);
+    ctx.lineTo(4, 6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+}
+
+function drawSignalHead(x, y, label, activeColor) {
+    ctx.fillStyle = "#1e2933";
+    ctx.fillRect(x + 16, y + 92, 6, 26);
+
+    ctx.fillStyle = "#0c1218";
+    ctx.strokeStyle = "#2b3846";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, 38, 92, 7);
+    else ctx.rect(x, y, 38, 92);
+    ctx.fill();
+    ctx.stroke();
+
+    drawLamp(x + 19, y + 18, "#ff3344", activeColor === "RED");
+    drawLamp(x + 19, y + 46, "#ffd34d", activeColor === "YELLOW");
+    drawLamp(x + 19, y + 74, "#35e98c", activeColor === "GREEN");
+
+    ctx.fillStyle = "#9db2c6";
+    ctx.font = "bold 8px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(label, x + 19, y - 6);
+
+    const isEmergPriority = (trafficMode === "EMERGENCY" && activeColor === "GREEN");
+    const timerText = isEmergPriority ? "PRIORITY" : `${Math.ceil(signalTimer)}s`;
+    ctx.fillStyle = isEmergPriority ? "#35e98c" : (activeColor === "GREEN" ? "#35e98c" : (activeColor === "YELLOW" ? "#ffd34d" : "#ff6076"));
+    ctx.fillText(timerText, x + 19, y + 104);
+}
+
+function drawLamp(cx, cy, color, isActive) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, 9, 0, Math.PI * 2);
+    if (isActive) {
+        ctx.save();
+        ctx.shadowBlur = 18;
+        ctx.shadowColor = color;
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.restore();
+    } else {
+        ctx.fillStyle = "rgba(35, 45, 55, 0.85)";
+        ctx.fill();
+    }
+}
+
+function drawVehicle(v) {
+    ctx.save();
+    ctx.translate(v.x, v.y);
+
+    const baseAngle = (v.heading === "EAST") ? 0 : (v.heading === "WEST" ? Math.PI : (v.heading === "SOUTH" ? Math.PI / 2 : -Math.PI / 2));
+    ctx.rotate(baseAngle + (v.steerAngle || 0));
+
+    // Selection Halo
+    if (v.id === selectedId) {
+        ctx.strokeStyle = "rgba(69, 230, 255, 0.95)";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(-v.length/2 - 5, -v.width/2 - 5, v.length + 10, v.width + 10);
+        ctx.setLineDash([]);
+    }
+
+    // Emergency Flashing Beacon Glow
+    if (v.emergency) {
+        const strobeColor = (Math.floor(Date.now() / 120) % 2 === 0) ? "#ff2233" : "#2299ff";
+        ctx.shadowBlur = 22;
+        ctx.shadowColor = strobeColor;
+    }
+
+    const hl = v.length / 2;
+    const hw = v.width / 2;
+
+    if (v.emergency) {
+        // AMBULANCE / FIRE / POLICE
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(-hl, -hw, v.length, v.width, 4);
+        else ctx.rect(-hl, -hw, v.length, v.width);
+        ctx.fill();
+
+        ctx.fillStyle = "#e53935";
+        ctx.fillRect(-hl + 4, -hw, v.length - 8, 3);
+        ctx.fillRect(-hl + 4, hw - 3, v.length - 8, 3);
+        ctx.fillRect(-4, -6, 8, 12);
+        ctx.fillRect(-7, -3, 14, 6);
+
+        ctx.fillStyle = "#0c1822";
+        ctx.fillRect(hl - 9, -hw + 2, 5, v.width - 4);
+        ctx.fillRect(-hl + 2, -hw + 3, 3, v.width - 6);
+
+        const strobeLeft = (Math.floor(Date.now() / 110) % 2 === 0) ? "#ff1744" : "#2979ff";
+        const strobeRight = (strobeLeft === "#ff1744") ? "#2979ff" : "#ff1744";
+        ctx.fillStyle = strobeLeft;
+        ctx.fillRect(-2, -hw + 2, 4, 5);
+        ctx.fillStyle = strobeRight;
+        ctx.fillRect(-2, hw - 7, 4, 5);
+
+        ctx.fillStyle = "#fff9c4";
+        ctx.fillRect(hl - 2, -hw + 1, 2, 4);
+        ctx.fillRect(hl - 2, hw - 5, 2, 4);
+
+    } else if (/auto|rickshaw/i.test(v.type)) {
+        ctx.fillStyle = "#2e7d32";
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(-hl, -hw, v.length, v.width, 3);
+        else ctx.rect(-hl, -hw, v.length, v.width);
+        ctx.fill();
+
+        ctx.fillStyle = "#fbc02d";
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(-hl + 4, -hw + 1, v.length - 9, v.width - 2, 2);
+        else ctx.fillRect(-hl + 4, -hw + 1, v.length - 9, v.width - 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#1e282d";
+        ctx.beginPath();
+        ctx.moveTo(hl, 0);
+        ctx.lineTo(hl - 6, -hw + 2);
+        ctx.lineTo(hl - 6, hw - 2);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = "#fff9c4";
+        ctx.fillRect(hl - 1, -2, 2, 4);
+
+    } else if (/bike|motorcycle/i.test(v.type)) {
+        ctx.fillStyle = v.color;
+        ctx.fillRect(-hl, -2, v.length, 4);
+        ctx.fillStyle = "#37474f";
+        ctx.fillRect(hl - 6, -hw, 3, v.width);
+        ctx.fillStyle = "#ffd54f";
+        ctx.beginPath();
+        ctx.arc(-1, 0, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#fffde7";
+        ctx.fillRect(hl - 1, -2, 2, 4);
+
+    } else if (/bus/i.test(v.type)) {
+        ctx.fillStyle = v.color;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(-hl, -hw, v.length, v.width, 4);
+        else ctx.rect(-hl, -hw, v.length, v.width);
+        ctx.fill();
+
+        ctx.fillStyle = "#0a131a";
+        ctx.fillRect(hl - 7, -hw + 2, 5, v.width - 4);
+        for (let wx = -hl + 5; wx < hl - 9; wx += 8) {
+            ctx.fillRect(wx, -hw + 2, 5, 3);
+            ctx.fillRect(wx, hw - 5, 5, 3);
+        }
+        ctx.fillStyle = "#fff9c4";
+        ctx.fillRect(hl - 1, -hw + 1, 2, 4);
+        ctx.fillRect(hl - 1, hw - 5, 2, 4);
+
+    } else if (/truck/i.test(v.type)) {
+        ctx.fillStyle = v.color;
+        ctx.fillRect(-hl, -hw, v.length - 12, v.width);
+        ctx.fillStyle = "#455a64";
+        ctx.fillRect(hl - 11, -hw + 1, 10, v.width - 2);
+        ctx.fillStyle = "#0c151c";
+        ctx.fillRect(hl - 5, -hw + 2, 3, v.width - 4);
+        ctx.fillStyle = "#fff9c4";
+        ctx.fillRect(hl - 1, -hw + 2, 2, 4);
+        ctx.fillRect(hl - 1, hw - 6, 2, 4);
+
+    } else {
+        ctx.fillStyle = v.color;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(-hl, -hw, v.length, v.width, 4);
+        else ctx.rect(-hl, -hw, v.length, v.width);
+        ctx.fill();
+
+        ctx.fillStyle = "#0a131a";
+        ctx.fillRect(hl - 10, -hw + 2, 5, v.width - 4);
+        ctx.fillRect(-hl + 4, -hw + 2, 4, v.width - 4);
+        ctx.fillRect(-hl + 8, -hw + 1, v.length - 17, 2);
+        ctx.fillRect(-hl + 8, hw - 3, v.length - 17, 2);
+
+        ctx.fillStyle = "#fff9c4";
+        ctx.fillRect(hl - 1, -hw + 2, 2, 4);
+        ctx.fillRect(hl - 1, hw - 6, 2, 4);
+        ctx.fillStyle = "#d32f2f";
+        ctx.fillRect(-hl, -hw + 2, 1.5, 3);
+        ctx.fillRect(-hl, hw - 5, 1.5, 3);
+    }
+
+    ctx.restore();
+
+    ctx.fillStyle = v.emergency ? "#ff6076" : (v.id === selectedId ? "#45e6ff" : "#cfd8dc");
+    ctx.font = "bold 9px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(`${v.type} ${v.id}`, v.x, v.y - 15);
+}
+
+function updateCanvasOverlays() {
+    const ewColor = getSignalColor("EW");
+    const nsColor = getSignalColor("NS");
+
+    const ewDot = document.getElementById("sigDotEW");
+    const nsDot = document.getElementById("sigDotNS");
+    const ewText = document.getElementById("sigTextEW");
+    const nsText = document.getElementById("sigTextNS");
+
+    if (ewDot) ewDot.className = `sigDot ${ewColor.toLowerCase()}`;
+    if (nsDot) nsDot.className = `sigDot ${nsColor.toLowerCase()}`;
+
+    const isEmerg = (trafficMode === "EMERGENCY");
+    const ewTimeStr = (isEmerg && ewColor === "GREEN") ? "PRIORITY" : `${Math.ceil(signalTimer)}s`;
+    const nsTimeStr = (isEmerg && nsColor === "GREEN") ? "PRIORITY" : `${Math.ceil(signalTimer)}s`;
+
+    if (ewText) ewText.innerText = `${ewColor} ${ewTimeStr}`;
+    if (nsText) nsText.innerText = `${nsColor} ${nsTimeStr}`;
+
+    const modeBadge = document.getElementById("canvasModeBadge");
+    if (modeBadge) {
+        modeBadge.innerText = isEmerg ? "🚨 EMERGENCY PRIORITY" : "MODE: AUTO / RUNNING";
+        modeBadge.style.color = isEmerg ? "var(--red)" : "var(--cyan)";
+        modeBadge.style.borderColor = isEmerg ? "rgba(255,77,94,0.5)" : "rgba(69,230,255,0.3)";
+    }
+
+    const sel = vehicles.find(v => v.id === selectedId);
+    const selInfo = document.getElementById("selectedInfo");
+    if (selInfo) {
+        if (sel) {
+            selInfo.innerText = `${sel.type} #${sel.id} (${sel.lane} | ${sel.state} | ${sel.wait}s wait)`;
+        } else {
+            selInfo.innerText = "No vehicle selected (Click table row or Search)";
+        }
+    }
+}
+
+// Single Unified Animation Loop
+function gameLoop(now) {
+    const dt = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+
+    if (simulationRunning) {
+        updateSignals(dt);
+        updateVehicles(dt);
+        updateSpawner(dt);
+    }
+
+    render();
+    updateCGPanel();   // CG Engine: CO1, CO2, CO3, CO5 — updates every frame
+    animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+// ==========================================
+// VEHICLE CONTROL (CRUD) & ALL 8 BUTTONS
+// ==========================================
+function getData(){
+    return {
+        id: Number(document.getElementById("vehicleId").value),
+        type: document.getElementById("vehicleType").value.trim(),
+        emergency: document.getElementById("emergency").value.trim().toUpperCase() === "YES",
+        wait: Number(document.getElementById("waitTime").value)
+    };
+}
+
+function insertVehicle(){
+    const d = getData();
+
+    if(!d.id || !d.type || isNaN(d.wait)){
+        showToast("warning", "Input Validation Error", "Please enter Vehicle ID, Type, and Wait Time.");
+        return;
+    }
+
+    if(vehicles.some(x => x.id === d.id)){
+        showToast("warning", "Duplicate Vehicle ID", `Vehicle ${d.id} already exists in database.`);
+        return;
+    }
+
+    const isEmergType = /ambulance|fire|police/i.test(d.type);
+    const isEmergency = d.emergency || isEmergType;
+
+    let chosenLane = "EW_EB";
+    if (isEmergency) {
+        chosenLane = "EW_EB";
+    } else {
+        const laneCounts = { EW_EB: 0, NS_SB: 0, EW_WB: 0, NS_NB: 0 };
+        vehicles.forEach(v => { if (laneCounts[v.lane] !== undefined) laneCounts[v.lane]++; });
+        const lanes = ["EW_EB", "NS_SB", "EW_WB", "NS_NB"];
+        lanes.sort((a, b) => laneCounts[a] - laneCounts[b]);
+        chosenLane = lanes[0];
+    }
+
+    const v = new SimulationVehicle(d.id, d.type, isEmergency, d.wait, chosenLane);
+    vehicles.push(v);
+    linkedList.push(v.id);
+
+    if (isEmergency) {
+        if (!emergencyStack.includes(v.id)) emergencyStack.push(v.id);
+        triggerEmergencyPriority(v.id);
+    } else {
+        if (!queue.includes(v.id)) queue.push(v.id);
+    }
+
+    selectedId = v.id;
+
+    // Clear input fields
+    document.getElementById("vehicleId").value = "";
+    document.getElementById("vehicleType").value = "";
+    document.getElementById("emergency").value = "";
+    document.getElementById("waitTime").value = "";
+
+    displayVehicles();
+    renderAllDataStructures();
+    updateCOA();
+    updateDashboardStats();
+    markSynced();
+
+    showToast("success", "Vehicle Registered", `✓ Vehicle ${v.id} (${v.type}) successfully registered.`);
+    logActivity("insert", `Vehicle ${v.id} registered into ${v.heading} lane.`);
+    document.getElementById("missionStatus").innerText = `✓ Vehicle ${v.id} successfully registered.`;
+}
+
+function updateVehicle(){
+    const d = getData();
+    if (!d.id) {
+        showToast("warning", "Missing ID", "Enter a Vehicle ID to update.");
+        return;
+    }
+
+    const v = vehicles.find(x => x.id === d.id);
+    if (!v) {
+        showToast("error", "Vehicle Not Found", `✕ Vehicle ${d.id} not found in database.`);
+        document.getElementById("missionStatus").innerText = `Vehicle ${d.id} not found.`;
+        return;
+    }
+
+    if (d.type) v.type = d.type;
+    if (!isNaN(d.wait)) v.wait = d.wait;
+
+    const wasEmergency = v.emergency;
+    const isEmergType = /ambulance|fire|police/i.test(d.type);
+    v.emergency = d.emergency || isEmergType;
+    v.lastUpdated = new Date().toLocaleTimeString();
+
+    if (v.emergency && !wasEmergency) {
+        v.maxSpeed = 3.8;
+        v.color = "#ff4d5e";
+        queue = queue.filter(x => x !== v.id);
+        if (!emergencyStack.includes(v.id)) emergencyStack.push(v.id);
+        triggerEmergencyPriority(v.id);
+    } else if (!v.emergency && wasEmergency) {
+        emergencyStack = emergencyStack.filter(x => x !== v.id);
+        if (!queue.includes(v.id)) queue.push(v.id);
+        if (/auto|rickshaw/i.test(v.type)) { v.maxSpeed = 2.0; v.color = "#ffb300"; }
+        else if (/bike|motorcycle/i.test(v.type)) { v.maxSpeed = 2.5; v.color = "#ff7043"; }
+        else if (/bus/i.test(v.type)) { v.maxSpeed = 1.6; v.color = "#7e57c2"; }
+        else if (/truck/i.test(v.type)) { v.maxSpeed = 1.5; v.color = "#00897b"; }
+        else { v.maxSpeed = 2.2; v.color = "#35d6ff"; }
+        v.speed = v.maxSpeed;
+        if (activeEmergencyId === v.id) endEmergencyPriority();
+    }
+
+    selectedId = v.id;
+    displayVehicles();
+    renderAllDataStructures();
+    updateCOA();
+    updateDashboardStats();
+    markSynced();
+
+    showToast("success", "Vehicle Updated", `✓ Vehicle ${v.id} updated successfully.`);
+    logActivity("update", `Vehicle ${v.id} modified (${v.type}, Emerg: ${v.emergency})`);
+    document.getElementById("missionStatus").innerText = `✓ Vehicle ${v.id} updated successfully.`;
+}
+
+function deleteVehicle(){
+    let id = Number(document.getElementById("vehicleId").value);
+    if (!id && selectedId) id = selectedId;
+
+    if (!id) {
+        showToast("warning", "Missing ID", "Enter or select a Vehicle ID to delete.");
+        return;
+    }
+
+    const v = vehicles.find(x => x.id === id);
+    if (!v) {
+        showToast("error", "Vehicle Not Found", `✕ Vehicle ${id} not found.`);
+        return;
+    }
+
+    // Open confirmation modal
+    pendingDeleteId = id;
+    const modal = document.getElementById("deleteModal");
+    const msg = document.getElementById("deleteModalMsg");
+    if (msg) msg.innerText = `Delete Vehicle ${id} (${v.type}) from traffic network?`;
+    if (modal) modal.classList.add("active");
+}
+
+function closeDeleteModal() {
+    pendingDeleteId = null;
+    const modal = document.getElementById("deleteModal");
+    if (modal) modal.classList.remove("active");
+}
+
+function confirmDeleteVehicle() {
+    if (!pendingDeleteId) return;
+    const id = pendingDeleteId;
+    closeDeleteModal();
+
+    const wasSelected = (selectedId === id);
+    removeVehicleFromSystem(id);
+
+    if (wasSelected) {
+        selectedId = vehicles.length > 0 ? vehicles[0].id : null;
+    }
+
+    if (Number(document.getElementById("vehicleId").value) === id) {
+        document.getElementById("vehicleId").value = "";
+        document.getElementById("vehicleType").value = "";
+        document.getElementById("emergency").value = "";
+        document.getElementById("waitTime").value = "";
+    }
+
+    displayVehicles();
+    renderAllDataStructures();
+    updateCOA();
+    updateDashboardStats();
+    markSynced();
+
+    showToast("success", "Vehicle Removed", `✓ Vehicle ${id} removed.`);
+    logActivity("delete", `Vehicle ${id} purged from system.`);
+    document.getElementById("missionStatus").innerText = `✓ Vehicle ${id} removed.`;
+}
+
+function searchVehicle(){
+    const id = Number(document.getElementById("vehicleId").value);
+    if(!id){
+        showToast("warning", "Search Input Empty", "Enter a Vehicle ID to search.");
+        return;
+    }
+
+    const v = vehicles.find(x => x.id === id);
+    if(!v){
+        showToast("error", "Search Result", `Vehicle ${id} not found.`);
+        document.getElementById("missionStatus").innerText = `Vehicle ${id} not found.`;
+        return;
+    }
+
+    selectedId = v.id;
+    document.getElementById("vehicleId").value = v.id;
+    document.getElementById("vehicleType").value = v.type;
+    document.getElementById("emergency").value = v.emergency ? "YES" : "NO";
+    document.getElementById("waitTime").value = v.wait;
+
+    displayVehicles();
+    updateCOA();
+    updateDashboardStats();
+    markSynced();
+
+    // Scroll table to row
+    const targetRow = document.querySelector(`tr[data-id="${v.id}"]`);
+    if (targetRow) targetRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    const prio = calculatePriorityScore(v);
+    showToast("info", "Vehicle Found", `ID: ${v.id} | ${v.type} | Priority: ${prio}`);
+    logActivity("prio", `Vehicle ${v.id} searched & telemetry inspected.`);
+    document.getElementById("missionStatus").innerText = `VEHICLE FOUND: ${v.type} #${v.id} | Lane: ${v.lane} | Speed: ${v.speed.toFixed(1)} | Prio: ${prio}`;
+}
+
+function displayVehicles(){
+    const table = document.getElementById("vehicleTable");
+    if (!table) return;
+    table.innerHTML = "";
+
+    const searchFilter = (document.getElementById("tableFilterInput")?.value || "").toLowerCase();
+
+    const filtered = vehicles.filter(v => {
+        if (activeFilter === "NORMAL" && v.emergency) return false;
+        if (activeFilter === "EMERGENCY" && !v.emergency) return false;
+        if (activeFilter === "WAITING" && v.status !== "WAITING") return false;
+        if (activeFilter === "PRIORITY" && v.status !== "PRIORITY ACTIVE") return false;
+
+        if (searchFilter) {
+            const matchesId = String(v.id).includes(searchFilter);
+            const matchesType = v.type.toLowerCase().includes(searchFilter);
+            if (!matchesId && !matchesType) return false;
+        }
+        return true;
+    });
+
+    filtered.forEach(v => {
+        const row = document.createElement("tr");
+        row.setAttribute("data-id", v.id);
+
+        if (v.id === selectedId) row.classList.add("selectedRow");
+        if (v.emergency) row.classList.add("emergRow");
+
+        let statusClass = "moving";
+        if (v.status === "WAITING") statusClass = "waiting";
+        else if (v.status === "CROSSING") statusClass = "crossing";
+        else if (v.status === "PRIORITY ACTIVE") statusClass = "priority";
+        else if (v.status === "STOPPED") statusClass = "stopped";
+
+        const prioScore = calculatePriorityScore(v);
+
+        row.innerHTML = `
+            <td><b>${v.id}</b></td>
+            <td>${v.type}</td>
+            <td>${v.emergency ? '<b style="color:var(--red)">YES</b>' : 'NO'}</td>
+            <td>${v.wait}s</td>
+            <td><b style="color:var(--cyan)">${prioScore}</b></td>
+            <td><span class="statusPill ${statusClass}">${v.status}</span></td>
+            <td style="color:var(--text-muted)">${v.lastUpdated || 'just now'}</td>
+        `;
+
+        row.onclick = () => {
+            selectedId = v.id;
+            document.getElementById("vehicleId").value = v.id;
+            document.getElementById("vehicleType").value = v.type;
+            document.getElementById("emergency").value = v.emergency ? "YES" : "NO";
+            document.getElementById("waitTime").value = v.wait;
+            // displayVehicles(); // removed to avoid duplicate refresh
+            updateCOA();
+            updateDashboardStats();
+        };
+
+        table.appendChild(row);
+    });
+
+    // Refresh visualizations and stats
+    renderAllDataStructures();
+    updateDashboardStats();
+    updateCOA();
+
+    // Show toast feedback
+    if (filtered.length === 0) {
+        // Show empty table message
+        const emptyRow = document.createElement("tr");
+        const emptyCell = document.createElement("td");
+        emptyCell.colSpan = 7;
+        emptyCell.style.textAlign = "center";
+        emptyCell.textContent = "No vehicles available.";
+        emptyRow.appendChild(emptyCell);
+        table.appendChild(emptyRow);
+        showToast("info","Display","No vehicles available.");
+    } else {
+        showToast("info","Display","Vehicle data displayed successfully");
+    }
+}
+
+function setFilter(filterType, btn) {
+    activeFilter = filterType;
+    document.querySelectorAll(".filterBtn").forEach(b => b.classList.remove("active"));
+    if (btn) btn.classList.add("active");
+    displayVehicles();
+}
+
+function clearForm(){
+    document.getElementById("vehicleId").value = "";
+    document.getElementById("vehicleType").value = "";
+    document.getElementById("emergency").value = "";
+    document.getElementById("waitTime").value = "";
+    showToast("info", "Form Reset", "Input fields cleared.");
+    document.getElementById("missionStatus").innerText = "Input fields cleared.";
+}
+
+function startSimulation(){
+    simulationRunning = true;
+    document.getElementById("simState").innerText = "AUTO / RUNNING";
+    document.getElementById("simState").style.color = "var(--green)";
+
+    // Find highest priority emergency vehicle
+    const emergVehicles = vehicles.filter(x => x.emergency);
+    if (emergVehicles.length > 0) {
+        emergVehicles.sort((a, b) => calculatePriorityScore(b) - calculatePriorityScore(a));
+        const topEv = (selectedId && emergVehicles.find(x => x.id === selectedId)) || emergVehicles[0];
+        triggerEmergencyPriority(topEv.id);
+    } else {
+        showToast("warning", "No Emergency Vehicle", "No emergency vehicle available in traffic network.");
+        document.getElementById("missionStatus").innerText = "No emergency vehicle available.";
+    }
+}
+
+function stopSimulation(){
+    if (trafficMode === "EMERGENCY") {
+        endEmergencyPriority();
+        showToast("success", "Priority Stopped", "✓ Priority mode stopped — normal traffic control restored.");
+    } else {
+        simulationRunning = !simulationRunning;
+        if (simulationRunning) {
+            document.getElementById("simState").innerText = "AUTO / RUNNING";
+            document.getElementById("simState").style.color = "var(--green)";
+            showToast("info", "Simulation Resumed", "Traffic flow running.");
+        } else {
+            document.getElementById("simState").innerText = "PAUSED";
+            document.getElementById("simState").style.color = "var(--amber)";
+            showToast("info", "Simulation Paused", "Traffic flow temporarily halted.");
+        }
+    }
+}
+
+// ==========================================
+// DATA STRUCTURE VISUALIZATIONS
+// ==========================================
+function renderAllDataStructures() {
+    renderArray();
+    renderLinkedList();
+    renderQueue();
+    renderStack();
+}
+
+function renderArray() {
+    const box = document.getElementById("arrayVisual");
+    if (!box) return;
+
+    if (vehicles.length === 0) {
+        box.innerHTML = '<span class="dsEmpty">ARRAY EMPTY</span>';
+        return;
+    }
+
+    box.innerHTML = vehicles.map((v, idx) => `
+        <span class="dsNode ${v.emergency ? 'emergency' : ''}">
+            <span class="dsIdx">[${idx}]</span> ${v.id}:${v.type}
+        </span>
+    `).join("");
+}
+
+function renderLinkedList(){
+    const box = document.getElementById("linkedListVisual");
+    if (!box) return;
+
+    if(linkedList.length === 0){
+        box.innerHTML = '<span class="dsEmpty">HEAD → NULL</span>';
+        return;
+    }
+
+    box.innerHTML =
+        '<span class="dsEmpty">HEAD → </span>' +
+        linkedList.map(id => {
+            const v = vehicles.find(x => x.id === id);
+            return `<span class="dsNode ${v && v.emergency ? 'emergency' : ''}">[${id}]</span>`;
+        }).join('<span class="dsArrow"> → </span>') +
+        '<span class="dsArrow"> → NULL</span>';
+}
+
+function renderQueue(){
+    const box = document.getElementById("queueVisual");
+    if (!box) return;
+
+    if(queue.length === 0){
+        box.innerHTML = '<span class="dsEmpty">FRONT → EMPTY ← REAR</span>';
+        return;
+    }
+
+    box.innerHTML =
+        '<span class="dsEmpty">FRONT → </span>' +
+        queue.map(id => `<span class="dsNode">[${id}]</span>`).join('<span class="dsArrow"> → </span>') +
+        '<span class="dsArrow"> ← REAR</span>';
+}
+
+function renderStack(){
+    const box = document.getElementById("stackVisual");
+    if (!box) return;
+
+    if(emergencyStack.length === 0){
+        box.innerHTML = '<span class="dsEmpty">TOP → EMPTY</span>';
+        return;
+    }
+
+    box.innerHTML =
+        '<span class="dsEmpty">TOP → </span>' +
+        emergencyStack.slice().reverse().map(id => `<span class="dsNode emergency">[${id}]</span>`).join('<span class="dsArrow"> • </span>');
+}
+
+// Data structure explicit operations
+function llInsert(){
+    const id = Number(document.getElementById("llId").value);
+    if(!id){ showToast("warning", "Input Error", "Enter Vehicle ID."); return; }
+    if(!vehicles.some(v => v.id === id)){ showToast("error", "Error", "Vehicle must exist in database first."); return; }
+    if(linkedList.includes(id)){ showToast("warning", "Duplicate", `Vehicle ${id} already in Linked List.`); return; }
+
+    linkedList.push(id);
+    renderLinkedList();
+    document.getElementById("llInfo").innerText = `Vehicle ${id} appended to Linked List.`;
+    showToast("success", "Linked List", `✓ Vehicle ${id} inserted into Linked List.`);
+}
+
+function llDelete(){
+    const id = Number(document.getElementById("llId").value);
+    const index = linkedList.indexOf(id);
+    if(index < 0){ showToast("error", "Error", `Vehicle ${id} not found in Linked List.`); return; }
+
+    linkedList.splice(index, 1);
+    renderLinkedList();
+    document.getElementById("llInfo").innerText = `Vehicle ${id} deleted from Linked List.`;
+    showToast("success", "Linked List", `✓ Vehicle ${id} removed from Linked List.`);
+}
+
+function enqueueVehicle(){
+    const id = Number(document.getElementById("queueId").value);
+    if(!id){ showToast("warning", "Input Error", "Enter Vehicle ID."); return; }
+    if(!vehicles.some(v => v.id === id)){ showToast("error", "Error", "Vehicle not found in database."); return; }
+    if(queue.includes(id)){ showToast("warning", "Queue", `Vehicle ${id} already in Queue.`); return; }
+
+    queue.push(id);
+    renderQueue();
+    document.getElementById("co3Info").innerText = `Vehicle ${id} enqueued (FIFO Rear).`;
+    showToast("success", "Queue Enqueue", `✓ Vehicle ${id} added to Queue.`);
+}
+
+function dequeueVehicle(){
+    if(queue.length === 0){ showToast("warning", "Queue Empty", "No vehicles in FIFO Queue."); return; }
+    const id = queue.shift();
+    selectedId = id;
+    renderQueue();
+    updateCOA();
+    displayVehicles();
+    updateDashboardStats();
+    document.getElementById("co3Info").innerText = `Vehicle ${id} dequeued from Front.`;
+    showToast("info", "Queue Dequeue", `✓ Vehicle ${id} dequeued from Front (FIFO).`);
+}
+
+function pushEmergency(){
+    const id = Number(document.getElementById("stackId").value);
+    const v = vehicles.find(x => x.id === id);
+    if(!id){ showToast("warning", "Input Error", "Enter Emergency Vehicle ID."); return; }
+    if(!v){ showToast("error", "Error", "Vehicle not in database."); return; }
+    if(!v.emergency){ showToast("warning", "Invalid Type", "Only emergency units can be pushed to Emergency Stack."); return; }
+    if(emergencyStack.includes(id)){ showToast("warning", "Stack", `Emergency ${id} already on Stack.`); return; }
+
+    emergencyStack.push(id);
+    renderStack();
+    document.getElementById("co3Info").innerText = `Emergency ${id} pushed to Top (LIFO).`;
+    showToast("success", "Stack Push", `✓ Emergency unit ${id} pushed to Stack.`);
+}
+
+function popEmergency(){
+    if(emergencyStack.length === 0){ showToast("warning", "Stack Empty", "Emergency Stack is empty."); return; }
+    const id = emergencyStack.pop();
+    selectedId = id;
+    renderStack();
+    triggerEmergencyPriority(id);
+    document.getElementById("co3Info").innerText = `Emergency ${id} popped & given priority.`;
+    showToast("emergency", "Stack Pop", `🚨 Emergency ${id} popped from Stack & given priority.`);
+}
+
+// ==========================================
+// PROCESSOR / COA CALCULATIONS
+// ==========================================
+function updateCOA(){
+    const selected = vehicles.find(v => v.id === selectedId) || (vehicles.length > 0 ? vehicles[0] : null);
+
+    const count = vehicles.length;
+    const wait = selected ? selected.wait : 0;
+    const emergency = selected ? selected.emergency : false;
+
+    const mul = count * 2;
+    const bonus = emergency ? 50 : 0;
+
+    let typeWeight = 5;
+    if (selected) {
+        if (/ambulance/i.test(selected.type)) typeWeight = 25;
+        else if (/fire/i.test(selected.type)) typeWeight = 30;
+        else if (/police/i.test(selected.type)) typeWeight = 20;
+        else if (/bus/i.test(selected.type)) typeWeight = 15;
+        else if (/truck/i.test(selected.type)) typeWeight = 10;
+        else if (/bike/i.test(selected.type)) typeWeight = 2;
+    }
+
+    const priorityScore = mul + wait + bonus + typeWeight;
+    const greenTime = 30 + Math.min(priorityScore, 40);
+
+    // Registers
+    const elAX = document.getElementById("AX"); if (elAX) elAX.innerText = mul;
+    const elBX = document.getElementById("BX"); if (elBX) elBX.innerText = wait;
+    const elCX = document.getElementById("CX"); if (elCX) elCX.innerText = priorityScore;
+    const elDX = document.getElementById("DX"); if (elDX) elDX.innerText = `${greenTime}s`;
+
+    // Breakdown
+    const elBonus = document.getElementById("mathBonus"); if (elBonus) elBonus.innerText = `+${bonus}`;
+    const elWait = document.getElementById("mathWait"); if (elWait) elWait.innerText = `+${wait}`;
+    const elType = document.getElementById("mathType"); if (elType) elType.innerText = `+${typeWeight}`;
+    const elDens = document.getElementById("mathDensity"); if (elDens) elDens.innerText = `+${mul}`;
+    const elTotal = document.getElementById("mathTotal"); if (elTotal) elTotal.innerText = priorityScore;
+
+    const elPrioVal = document.getElementById("priorityValue"); if (elPrioVal) elPrioVal.innerText = priorityScore;
+
+    const prioState = document.getElementById("priorityState");
+    if (prioState) {
+        if (emergency) {
+            prioState.innerText = "EMERGENCY OVERRIDE";
+            prioState.className = "prioBadge active";
+        } else {
+            prioState.innerText = "NORMAL SIGNAL";
+            prioState.className = "prioBadge";
+        }
+    }
+
+    // Assembly Code Labels
+    const coaCount = document.getElementById("coaCount"); if (coaCount) coaCount.innerText = count;
+    const coaWait = document.getElementById("coaWait"); if (coaWait) coaWait.innerText = wait;
+    const coaEmerg = document.getElementById("coaEmergency"); if (coaEmerg) coaEmerg.innerText = emergency ? "YES" : "NO";
+}
+
+// ==========================================
+// TOP STATS BAR CALCULATIONS
+// ==========================================
+function updateDashboardStats(){
+    const total = vehicles.length;
+    const emergCount = vehicles.filter(v => v.emergency).length;
+    const selected = vehicles.find(v => v.id === selectedId);
+
+    // 1. Registered Vehicles
+    const elVeh = document.getElementById("statVehicles");
+    if (elVeh) elVeh.innerText = total;
+
+    // 2. Emergency Units
+    const elEmerg = document.getElementById("statEmergency");
+    if (elEmerg) elEmerg.innerText = emergCount;
+    const trendEmerg = document.getElementById("trendEmerg");
+    if (trendEmerg) {
+        if (emergCount > 0) {
+            trendEmerg.className = "statTrend critical";
+            trendEmerg.innerText = `🚨 ${emergCount} ACTIVE`;
+        } else {
+            trendEmerg.className = "statTrend normal";
+            trendEmerg.innerText = "0 QUEUED";
+        }
+    }
+
+    // 3. Active Priority
+    const elPrio = document.getElementById("statPriority");
+    if (elPrio) {
+        if (activeEmergencyId) {
+            const ev = vehicles.find(x => x.id === activeEmergencyId);
+            elPrio.innerText = ev ? `${ev.type.toUpperCase()} #${ev.id}` : `#${activeEmergencyId}`;
+        } else if (selected && selected.emergency) {
+            elPrio.innerText = `${selected.type} #${selected.id}`;
+        } else {
+            elPrio.innerText = "--";
+        }
+    }
+
+    // 4. Average Wait Time
+    const avgWait = total > 0 ? (vehicles.reduce((acc, v) => acc + v.wait, 0) / total).toFixed(1) : "0.0";
+    const elAvgWait = document.getElementById("statAvgWait");
+    if (elAvgWait) elAvgWait.innerHTML = `${avgWait}<span class="statUnit">s</span>`;
+
+    // 5. Traffic Density
+    let densityLabel = "LOW";
+    let densityTagClass = "normal";
+    let loadPercent = Math.min(Math.round((total / 14) * 100), 100);
+
+    if (total >= 11) {
+        densityLabel = "CRITICAL";
+        densityTagClass = "critical";
+    } else if (total >= 7) {
+        densityLabel = "HIGH";
+        densityTagClass = "down";
+    } else if (total >= 4) {
+        densityLabel = "MODERATE";
+        densityTagClass = "up";
+    }
+
+    const statDensityVal = document.getElementById("statDensityVal");
+    const trendDensityTag = document.getElementById("trendDensityTag");
+    const statDensitySub = document.getElementById("statDensitySub");
+
+    if (statDensityVal) statDensityVal.innerText = densityLabel;
+    if (trendDensityTag) {
+        trendDensityTag.className = `statTrend ${densityTagClass}`;
+        trendDensityTag.innerText = densityLabel;
+    }
+    if (statDensitySub) statDensitySub.innerText = `CAPACITY LOAD: ${loadPercent}%`;
+
+    // 6. System Mode
+    const simState = document.getElementById("simState");
+    const trendModeTag = document.getElementById("trendModeTag");
+    if (simState && trendModeTag) {
+        if (trafficMode === "EMERGENCY") {
+            simState.innerText = "EMERGENCY OVERRIDE";
+            simState.style.color = "var(--red)";
+            trendModeTag.className = "statTrend critical";
+            trendModeTag.innerText = "OVERRIDE";
+        } else if (!simulationRunning) {
+            simState.innerText = "PAUSED";
+            simState.style.color = "var(--amber)";
+            trendModeTag.className = "statTrend down";
+            trendModeTag.innerText = "PAUSED";
+        } else {
+            simState.innerText = "AUTO / RUNNING";
+            simState.style.color = "var(--green)";
+            trendModeTag.className = "statTrend normal";
+            trendModeTag.innerText = "AUTO";
+        }
+    }
+}
+
+// ==========================================
+// INITIALIZATION
+// ==========================================
+function initSimulation() {
+    resizeCanvas();
+
+    vehicles = [];
+    linkedList = [];
+    queue = [];
+    emergencyStack = [];
+    completedCount = 0;
+    trafficMode = "NORMAL";
+    signalState = "EW_GREEN";
+    signalTimer = PHASE_DURATIONS.EW_GREEN;
+    simulationRunning = true;
+
+    const w = canvas.width || 600;
+    const h = canvas.height || 500;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    // Normal startup vehicles: 8 diverse vehicles distributed across all 4 directions
+    const v1 = new SimulationVehicle(101, "Car", false, 10, "EW_EB");
+    v1.x = cx - 170; vehicles.push(v1);
+
+    const v2 = new SimulationVehicle(102, "Bike", false, 14, "EW_EB");
+    v2.x = cx - 260; vehicles.push(v2);
+
+    const v3 = new SimulationVehicle(103, "Bus", false, 20, "NS_SB");
+    v3.y = cy - 160; vehicles.push(v3);
+
+    const v4 = new SimulationVehicle(104, "Auto-rickshaw", false, 8, "NS_SB");
+    v4.y = cy - 250; vehicles.push(v4);
+
+    const v5 = new SimulationVehicle(105, "Truck", false, 18, "EW_WB");
+    v5.x = cx + 180; vehicles.push(v5);
+
+    const v6 = new SimulationVehicle(106, "Car", false, 12, "EW_WB");
+    v6.x = cx + 270; vehicles.push(v6);
+
+    const v7 = new SimulationVehicle(107, "Auto-rickshaw", false, 14, "NS_NB");
+    v7.y = cy + 180; vehicles.push(v7);
+
+    const v8 = new SimulationVehicle(108, "Bike", false, 6, "NS_NB");
+    v8.y = cy + 260; vehicles.push(v8);
+
+    vehicles.forEach(v => {
+        linkedList.push(v.id);
+        queue.push(v.id);
+    });
+
+    selectedId = 101;
+
+    displayVehicles();
+    renderAllDataStructures();
+    updateCOA();
+    updateDashboardStats();
+    updateClock();
+
+    logActivity("sys", "Smart Traffic Command Center initialized.");
+    logActivity("sys", "Live signal controller operating at 12s Green / 17s Red cycle.");
+    logActivity("insert", "8 initial vehicles deployed across 4 junction corridors.");
+
+    document.getElementById("missionStatus").innerText =
+        "System online. Normal traffic simulation active across all 4 corridors.";
+
+    if (!animationFrameId) {
+        lastTime = performance.now();
+        animationFrameId = requestAnimationFrame(gameLoop);
+    }
+}
+
+// Backward compatibility helper
+function loadDemo() { initSimulation(); }
+
+// Startup
+window.addEventListener("load", initSimulation);
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initSimulation();
+}
+// ==========================================
+// COMPUTER GRAPHICS ENGINE
+// CO1 - Graphics Primitives used in traffic
+// CO2 - Transformations (Translation/Rotation/Scaling)
+// CO3 - Clipping to Road/Junction region
+// CO5 - 3D traffic signal + dynamic viewport
+// ==========================================
+
+let _cg3DAngle = 0;
+
+function cgInsideJunction(v) {
+    const cw = canvas.width || 600, ch = canvas.height || 500;
+    const cx = cw / 2, cy = ch / 2;
+    return (v.x >= cx - 95 && v.x <= cx + 95 && v.y >= cy - 95 && v.y <= cy + 95);
+}
+
+function cgDrawClipDemo() {
+    const cc = document.getElementById("cgClipCanvas");
+    if (!cc) return;
+    const cctx = cc.getContext("2d");
+    const W = cc.width, H = cc.height;
+
+    cctx.clearRect(0, 0, W, H);
+    cctx.fillStyle = "#070d0b";
+    cctx.fillRect(0, 0, W, H);
+
+    const cw = canvas.width || 600, ch = canvas.height || 500;
+    const cx = cw / 2, cy = ch / 2;
+    const scale = Math.min(W / cw, H / ch) * 0.75;
+    const ox = W / 2, oy = H / 2;
+    const mx = (x) => ox + (x - cx) * scale;
+    const my = (y) => oy + (y - cy) * scale;
+
+    cctx.fillStyle = "#1c2228";
+    cctx.fillRect(0, my(cy - 65), W, 130 * scale);
+    cctx.fillRect(mx(cx - 65), 0, 130 * scale, H);
+
+    const jx = mx(cx - 95), jy = my(cy - 95);
+    const jw = 190 * scale, jh = 190 * scale;
+    cctx.strokeStyle = "rgba(69,230,255,0.85)";
+    cctx.lineWidth = 1.5;
+    cctx.strokeRect(jx, jy, jw, jh);
+    cctx.fillStyle = "rgba(69,230,255,0.07)";
+    cctx.fillRect(jx, jy, jw, jh);
+
+    cctx.fillStyle = "rgba(69,230,255,0.7)";
+    cctx.font = "bold 8px monospace";
+    cctx.textAlign = "center";
+    cctx.fillText("ROAD / JUNCTION REGION", ox, jy - 5);
+
+    const sel = vehicles.find(v => v.id === selectedId) || vehicles[0];
+    if (sel) {
+        const inside = cgInsideJunction(sel);
+        
+        cctx.strokeStyle = inside ? "rgba(69,230,255,0.5)" : "rgba(255,77,94,0.4)";
+        cctx.setLineDash([3, 3]);
+        cctx.beginPath();
+        cctx.moveTo(ox, oy);
+        cctx.lineTo(mx(sel.x), my(sel.y));
+        cctx.stroke();
+        cctx.setLineDash([]);
+        
+        cctx.fillStyle = inside ? "#45e6ff" : "rgba(255,77,94,0.5)";
+        cctx.beginPath();
+        cctx.arc(mx(sel.x), my(sel.y), 4, 0, Math.PI * 2);
+        cctx.fill();
+        
+        cctx.fillStyle = inside ? "rgba(69,230,255,0.8)" : "rgba(255,77,94,0.8)";
+        cctx.fillText(inside ? "INSIDE" : "CLIPPED", mx(sel.x), my(sel.y) - 8);
+    }
+}
+
+function cgDraw3DSignal(angleY) {
+    const cc = document.getElementById("cg3DCanvas");
+    if (!cc) return;
+    const cctx = cc.getContext("2d");
+    const W = cc.width, H = cc.height;
+
+    cctx.clearRect(0, 0, W, H);
+    cctx.fillStyle = "#06080f";
+    cctx.fillRect(0, 0, W, H);
+
+    const S = 28; 
+    const project = (x3, y3, z3) => {
+        const cosA = Math.cos(angleY), sinA = Math.sin(angleY);
+        const rx = x3 * cosA + z3 * sinA;
+        const rz = -x3 * sinA + z3 * cosA;
+        return {
+            x: W / 2 + (rx - rz) * Math.cos(Math.PI / 6) * S,
+            y: H / 2 + 15 + ((rx + rz) * Math.sin(Math.PI / 6) - y3) * S
+        };
+    };
+
+    const pBot = project(0, 2.5, 0), pTop = project(0, -2.5, 0);
+    cctx.strokeStyle = "#3a4855"; cctx.lineWidth = 4;
+    cctx.beginPath(); cctx.moveTo(pBot.x, pBot.y); cctx.lineTo(pTop.x, pTop.y); cctx.stroke();
+
+    const bw = 0.38, bh = 1.1, bd = 0.26;
+    const corners = [
+        [-bw,-bh,-bd],[bw,-bh,-bd],[bw,bh,-bd],[-bw,bh,-bd],
+        [-bw,-bh, bd],[bw,-bh, bd],[bw,bh, bd],[-bw,bh, bd]
+    ].map(([x,y,z]) => project(x,y,z));
+
+    const face = (idx, fill, stroke) => {
+        cctx.beginPath();
+        cctx.moveTo(corners[idx[0]].x, corners[idx[0]].y);
+        for (let i = 1; i < idx.length; i++) cctx.lineTo(corners[idx[i]].x, corners[idx[i]].y);
+        cctx.closePath();
+        cctx.fillStyle = fill; cctx.fill();
+        cctx.strokeStyle = stroke; cctx.lineWidth = 0.5; cctx.stroke();
+    };
+
+    face([0,1,2,3],"#182530","#2b3846");
+    face([4,5,6,7],"#1e2e3c","#2b3846");
+    face([0,1,5,4],"#1c2b38","#2b3846");
+    face([3,2,6,7],"#162028","#2b3846");
+    face([1,2,6,5],"#17242f","#2b3846");
+    face([0,3,7,4],"#152230","#2b3846");
+
+    const nsColor = typeof getSignalColor === "function" ? getSignalColor("NS") : "GREEN";
+    [
+        { y:-0.65, on:"#ff3344", off:"#1f1215", active: nsColor === "RED" },
+        { y: 0.00, on:"#ffd34d", off:"#1f1c10", active: nsColor === "YELLOW" },
+        { y: 0.65, on:"#35e98c", off:"#0e1f15", active: nsColor === "GREEN" }
+    ].forEach(lamp => {
+        const lp = project(0, lamp.y, bd + 0.06);
+        cctx.beginPath();
+        cctx.arc(lp.x, lp.y, S * 0.31, 0, Math.PI * 2);
+        if (lamp.active) {
+            cctx.save();
+            cctx.shadowBlur = 12; cctx.shadowColor = lamp.on;
+            cctx.fillStyle = lamp.on; cctx.fill();
+            cctx.restore();
+        } else {
+            cctx.fillStyle = lamp.off; cctx.fill();
+        }
+    });
+}
+
+function updateCGPanel() {
+    const sel = vehicles.find(v => v.id === selectedId) || vehicles[0];
+    
+    const inRegionEl = document.getElementById("cgCO3InRegion");
+    const statusEl = document.getElementById("cgCO3Status");
+    
+    if (sel) {
+        const inside = cgInsideJunction(sel);
+        if (inRegionEl) {
+            inRegionEl.textContent = inside ? "YES" : "NO";
+            inRegionEl.className = inside ? "cgVal green" : "cgVal amber";
+        }
+        if (statusEl) {
+            statusEl.textContent = inside ? "INSIDE" : "CLIPPING";
+            statusEl.className = inside ? "cgVal green" : "cgVal amber";
+        }
+    } else {
+        if (inRegionEl) { inRegionEl.textContent = "---"; inRegionEl.className = "cgVal"; }
+        if (statusEl) { statusEl.textContent = "---"; statusEl.className = "cgVal"; }
+    }
+    
+    _cg3DAngle += 0.015;
+    const angleEl = document.getElementById("cgCO5Angle");
+    if (angleEl) {
+        angleEl.textContent = ((_cg3DAngle * 180 / Math.PI) % 360).toFixed(0) + "°";
+    }
+    
+    const demoStatus = document.getElementById("cgDemoStatus");
+    const status = canvas && canvas.isConnected ? "LIVE DEMO" : "UNAVAILABLE";
+    if (demoStatus && demoStatus.textContent !== status) demoStatus.textContent = status;
+    
+    cgDrawClipDemo();
+    cgDraw3DSignal(_cg3DAngle);
+}
+</script>
+
+</body>
+</html>
